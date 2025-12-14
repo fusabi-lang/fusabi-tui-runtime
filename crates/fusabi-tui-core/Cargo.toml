@@ -5,6 +5,10 @@ edition = "2021"
 description = "Core TUI primitives for Fusabi"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/fusabi-lang/fusabi-tui-runtime"
+authors = ["Raibid Labs <contact@raibid.dev>"]
+readme = "README.md"
+keywords = ["tui", "terminal", "fusabi", "ui", "framework"]
+categories = ["command-line-interface", "gui", "rendering"]
 
 [dependencies]
 unicode-width = "0.1"

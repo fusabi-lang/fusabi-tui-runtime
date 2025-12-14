@@ -5,8 +5,12 @@ edition = "2021"
 description = "Widget library for Fusabi TUI"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/fusabi-lang/fusabi-tui-runtime"
+authors = ["Raibid Labs <contact@raibid.dev>"]
+readme = "README.md"
+keywords = ["tui", "terminal", "fusabi", "widgets", "ui"]
+categories = ["command-line-interface", "gui"]
 
 [dependencies]
-fusabi-tui-core = { path = "../fusabi-tui-core" }
+fusabi-tui-core = { path = "../fusabi-tui-core", version = "0.1.0" }
 unicode-width = "0.1"
 bitflags = "2.4"

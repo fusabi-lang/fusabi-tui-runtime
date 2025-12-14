@@ -2,9 +2,13 @@
 name = "fusabi-tui-scarab"
 version = "0.1.0"
 edition = "2021"
-license = "MIT OR Apache-2.0"
 description = "Scarab shared memory backend for Fusabi TUI"
+license = "MIT OR Apache-2.0"
 repository = "https://github.com/fusabi-lang/fusabi-tui-runtime"
+authors = ["Raibid Labs <contact@raibid.dev>"]
+readme = "README.md"
+keywords = ["tui", "terminal", "scarab", "shared-memory", "fusabi"]
+categories = ["command-line-interface", "rendering"]
 
 [dependencies]
 # Internal dependencies

@@ -5,11 +5,15 @@ edition = "2021"
 description = "Hot reload engine and dashboard runtime for Fusabi TUI"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/fusabi-lang/fusabi-tui-runtime"
+authors = ["Raibid Labs <contact@raibid.dev>"]
+readme = "README.md"
+keywords = ["tui", "terminal", "fusabi", "hot-reload", "dashboard"]
+categories = ["command-line-interface", "development-tools"]
 
 [dependencies]
-fusabi-tui-core = { path = "../fusabi-tui-core" }
-fusabi-tui-render = { path = "../fusabi-tui-render" }
-fusabi-tui-widgets = { path = "../fusabi-tui-widgets" }
+fusabi-tui-core = { path = "../fusabi-tui-core", version = "0.1.0" }
+fusabi-tui-render = { path = "../fusabi-tui-render", version = "0.1.0" }
+fusabi-tui-widgets = { path = "../fusabi-tui-widgets", version = "0.1.0" }
 notify = "6.1"
 tokio = { version = "1.36", features = ["full"] }
 thiserror = "1.0"

@@ -5,9 +5,13 @@ edition = "2021"
 description = "Renderer abstraction for Fusabi TUI"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/fusabi-lang/fusabi-tui-runtime"
+authors = ["Raibid Labs <contact@raibid.dev>"]
+readme = "README.md"
+keywords = ["tui", "terminal", "fusabi", "renderer", "backend"]
+categories = ["command-line-interface", "rendering"]
 
 [dependencies]
-fusabi-tui-core = { path = "../fusabi-tui-core" }
+fusabi-tui-core = { path = "../fusabi-tui-core", version = "0.1.0" }
 crossterm = { version = "0.28", optional = true }
 thiserror = "1.0"
 
