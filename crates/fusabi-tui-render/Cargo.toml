@@ -3,7 +3,8 @@ name = "fusabi-tui-render"
 version = "0.1.0"
 edition = "2021"
 description = "Renderer abstraction for Fusabi TUI"
-license = "MIT"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/fusabi-lang/fusabi-tui-runtime"
 
 [dependencies]
 fusabi-tui-core = { path = "../fusabi-tui-core" }

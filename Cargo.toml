@@ -1,3 +1,11 @@
 [workspace]
 resolver = "2"
 members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/fusabi-lang/fusabi-tui-runtime"
+keywords = ["tui", "terminal", "fusabi", "ui", "framework"]
+categories = ["command-line-interface", "gui", "rendering"]

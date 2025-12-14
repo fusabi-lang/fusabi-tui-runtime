@@ -3,7 +3,8 @@ name = "fusabi-tui-core"
 version = "0.1.0"
 edition = "2021"
 description = "Core TUI primitives for Fusabi"
-license = "MIT"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/fusabi-lang/fusabi-tui-runtime"
 
 [dependencies]
 unicode-width = "0.1"
