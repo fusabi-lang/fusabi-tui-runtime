@@ -12,6 +12,7 @@ categories = ["command-line-interface", "rendering"]
 
 [dependencies]
 fusabi-tui-core = { path = "../fusabi-tui-core", version = "0.1.0" }
+fusabi-tui-widgets = { path = "../fusabi-tui-widgets", version = "0.1.0" }
 crossterm = { version = "0.28", optional = true }
 thiserror = "1.0"
 

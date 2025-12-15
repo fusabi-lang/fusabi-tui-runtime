@@ -9,6 +9,7 @@ use fusabi_tui_core::{
     style::Style,
 };
 
+use crate::block::Block;
 use crate::widget::Widget;
 
 /// A tabs widget for displaying tab navigation.
@@ -39,6 +40,7 @@ pub struct Tabs {
     style: Style,
     highlight_style: Style,
     divider: String,
+    block: Option<Block>,
 }
 
 impl Tabs {
@@ -53,7 +55,14 @@ impl Tabs {
             style: Style::default(),
             highlight_style: Style::default(),
             divider: " ".to_string(),
+            block: None,
         }
+    }
+
+    /// Sets the block (border/title) for the tabs.
+    pub fn block(mut self, block: Block) -> Self {
+        self.block = Some(block);
+        self
     }
 
     /// Sets the index of the selected tab.
@@ -100,11 +109,20 @@ impl Widget for Tabs {
             return;
         }
 
-        // Only use the first row
+        // Render block first if present
+        let inner_area = if let Some(ref block) = self.block {
+            let inner = block.inner(area);
+            block.render(area, buf);
+            inner
+        } else {
+            area
+        };
+
+        // Only use the first row within the inner area
         let tabs_area = Rect {
-            x: area.x,
-            y: area.y,
-            width: area.width,
+            x: inner_area.x,
+            y: inner_area.y,
+            width: inner_area.width,
             height: 1,
         };
 

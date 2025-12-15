@@ -56,11 +56,15 @@ pub use fusabi_tui_core;
 // Core module exports
 pub mod error;
 pub mod renderer;
+pub mod terminal;
 pub mod test;
 
 // Feature-gated modules
 #[cfg(feature = "crossterm-backend")]
 pub mod crossterm;
+
+// Re-export terminal types for convenience
+pub use terminal::{CompletedFrame, Frame, Terminal};
 
 // Prelude for convenient imports
 pub mod prelude {
@@ -68,6 +72,7 @@ pub mod prelude {
 
     pub use crate::error::{RenderError, Result};
     pub use crate::renderer::Renderer;
+    pub use crate::terminal::{CompletedFrame, Frame, Terminal};
     pub use crate::test::TestRenderer;
 
     #[cfg(feature = "crossterm-backend")]
