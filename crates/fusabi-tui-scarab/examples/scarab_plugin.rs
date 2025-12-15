@@ -8,6 +8,7 @@
 //! 2. Run this plugin: `cargo run --example scarab_plugin --features plugin`
 
 use fusabi_tui_scarab::prelude::*;
+use fusabi_tui_scarab::SHMEM_PATH;
 use std::time::{Duration, Instant};
 
 /// A simple counter plugin that increments on each keypress.
