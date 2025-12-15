@@ -147,14 +147,14 @@ dependencies = [
 
 [[package]]
 name = "fusabi-tui-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "unicode-width",
 ]
 
 [[package]]
 name = "fusabi-tui-engine"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "fusabi-tui-core",
  "fusabi-tui-render",
@@ -167,7 +167,7 @@ dependencies = [
 
 [[package]]
 name = "fusabi-tui-render"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "crossterm",
  "fusabi-tui-core",
@@ -177,7 +177,7 @@ dependencies = [
 
 [[package]]
 name = "fusabi-tui-scarab"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "bytemuck",
  "fusabi-tui-core",
@@ -191,7 +191,7 @@ dependencies = [
 
 [[package]]
 name = "fusabi-tui-widgets"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "bitflags 2.10.0",
  "fusabi-tui-core",
