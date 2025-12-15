@@ -10,18 +10,5 @@ repository = "https://github.com/fusabi-lang/fusabi-tui-runtime"
 keywords = ["tui", "terminal", "fusabi", "ui", "framework"]
 categories = ["command-line-interface", "gui", "rendering"]
 
-# Workspace-level examples
-[[example]]
-name = "basic_app"
-path = "examples/basic_app.rs"
-
-[[example]]
-name = "dashboard"
-path = "examples/dashboard.rs"
-
-# Example dependencies
-[dev-dependencies]
-fusabi-tui-core = { path = "crates/fusabi-tui-core" }
-fusabi-tui-render = { path = "crates/fusabi-tui-render", features = ["crossterm-backend"] }
-fusabi-tui-widgets = { path = "crates/fusabi-tui-widgets" }
-fusabi-tui-engine = { path = "crates/fusabi-tui-engine" }
+# Note: Examples are in examples/ directory but must be run via a crate
+# Run with: cargo run -p fusabi-tui-engine --example basic_app
