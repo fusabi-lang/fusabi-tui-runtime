@@ -289,10 +289,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         let _ = engine.reload();
                     }
                     KeyCode::Up => {
-                        dashboard.list_state.select_previous();
+                        dashboard.list_state.select_previous(dashboard.log_items.len());
                     }
                     KeyCode::Down => {
-                        dashboard.list_state.select_next();
+                        dashboard.list_state.select_next(dashboard.log_items.len());
                     }
                     _ => {}
                 },
@@ -311,7 +311,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Cleanup
-    engine.renderer_mut().cleanup()?;
+    engine.renderer_mut().clear()?;
     println!("Dashboard shut down gracefully");
 
     Ok(())
