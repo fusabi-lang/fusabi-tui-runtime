@@ -77,13 +77,14 @@ A unified framework where Fusabi applications can:
 
 ### Applications (Migrate to fusabi-tui-runtime)
 
-| Project | Current State | Migration Path |
-|---------|---------------|----------------|
-| **Scryforge** | 50K LOC, has fusabi-tui-* crates | Extract/merge crates |
-| **Phage** | 25K LOC, Fusabi config | Port TUI to runtime |
-| **Sigilforge** | 5K LOC, CLI only | Write TUI in Fusabi |
-| **Hibana** | hibana-top dashboard | Template for dashboard system |
-| **Tolaria** | Complex multi-view TUI | Template for BRP pattern |
+| Project | Current State | Migration Status |
+|---------|---------------|------------------|
+| **Scryforge** | 50K LOC | ✅ Migrated (uses crates.io) |
+| **Phage** | 25K LOC, Fusabi config | ✅ Migrated (uses crates.io) |
+| **Sigilforge** | 5K LOC, CLI only | ✅ Migrated (uses crates.io) |
+| **Hibana** | hibana-top dashboard | ✅ Migrated ([PR #27](https://github.com/raibid-labs/hibana/pull/27)) |
+| **Scarab** | Terminal emulator | ✅ Migrated (uses crates.io) |
+| **Tolaria** | Complex multi-view TUI | Optional (uses Bevy) |
 
 ### Support Projects
 
@@ -245,34 +246,37 @@ fn test_plugin_in_scarab() {
 
 ## Migration Timeline
 
-### Phase 1: Foundation (Weeks 1-4)
+### Phase 1: Foundation ✅ COMPLETE
 
-1. Create `fusabi-tui-runtime` crate
-2. Port core types from ratatui-core
-3. Implement CrosstermRenderer
-4. Implement ScarabRenderer
-5. Basic widget system
+1. ✅ Create `fusabi-tui-runtime` workspace (5 crates)
+2. ✅ Port core types from ratatui-core
+3. ✅ Implement CrosstermRenderer
+4. ✅ Implement Terminal/Frame abstraction
+5. ✅ Basic widget system
+6. ✅ Publish to crates.io (v0.1.0)
 
-### Phase 2: Integration (Weeks 5-8)
+### Phase 2: Integration ✅ COMPLETE
 
-6. Hot-reload infrastructure
-7. Dashboard engine
-8. Sigilforge TUI (clean slate)
-9. Hibana-top port (validation)
+7. ✅ Hibana-top port (validated migration path)
+8. ✅ Scryforge migration (uses crates.io)
+9. ✅ Phage migration (uses crates.io)
+10. ✅ Sigilforge migration (uses crates.io)
+11. ✅ Scarab migration (uses crates.io)
+12. ✅ scarab-nav fusabi-tui helper
 
-### Phase 3: Migration (Weeks 9-12)
+### Phase 3: Ecosystem (In Progress)
 
-10. Scryforge migration
-11. Phage migration
-12. Package registry setup
-13. Documentation and examples
+13. ⏳ Hot-reload infrastructure
+14. ⏳ Dashboard engine
+15. ⏳ ScarabRenderer (shared memory)
+16. ⏳ Package registry setup
 
-### Phase 4: Polish (Weeks 13-16)
+### Phase 4: Polish (Planned)
 
-14. Type providers for widgets
-15. LSP integration
-16. Advanced testing patterns
-17. Performance optimization
+17. Type providers for widgets
+18. LSP integration
+19. Advanced testing patterns
+20. Performance optimization
 
 ---
 
