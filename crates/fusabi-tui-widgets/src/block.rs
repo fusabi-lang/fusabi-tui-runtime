@@ -266,6 +266,33 @@ impl Block {
         self
     }
 
+    /// Applies theme styles to the block.
+    ///
+    /// This method uses the theme's "border" and "title" styles to automatically
+    /// style the block's borders and title text.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use fusabi_tui_core::theme::Theme;
+    /// use fusabi_tui_widgets::block::Block;
+    /// use fusabi_tui_widgets::borders::Borders;
+    ///
+    /// let theme = Theme::dark();
+    /// let block = Block::default()
+    ///     .title("Themed Panel")
+    ///     .borders(Borders::ALL)
+    ///     .themed(&theme);
+    /// ```
+    pub fn themed(mut self, theme: &fusabi_tui_core::Theme) -> Self {
+        self.border_style = theme.get_style("border");
+        self.style = theme.base_style();
+        if let Some(ref mut title) = self.title {
+            title.style = theme.get_style("title");
+        }
+        self
+    }
+
     /// Computes the inner area after accounting for borders and padding.
     ///
     /// This is the area where child widgets should be rendered.
