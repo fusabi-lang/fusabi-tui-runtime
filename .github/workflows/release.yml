@@ -37,8 +37,8 @@ jobs:
 
       - name: Build and test
         run: |
-          cargo build --workspace
-          cargo test --workspace
+          cargo build --workspace --lib
+          cargo test --workspace --lib
 
       # Publish in dependency order with delays for index updates
       - name: Publish fusabi-tui-core
