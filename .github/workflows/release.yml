@@ -1,0 +1,96 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (no actual publish)'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  publish:
+    name: Publish to crates.io
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build and test
+        run: |
+          cargo build --workspace
+          cargo test --workspace
+
+      # Publish in dependency order with delays for index updates
+      - name: Publish fusabi-tui-core
+        if: ${{ inputs.dry_run != 'true' }}
+        run: cargo publish -p fusabi-tui-core --token ${{ secrets.CARGO_TOKEN }}
+        continue-on-error: true
+
+      - name: Wait for crates.io index
+        if: ${{ inputs.dry_run != 'true' }}
+        run: sleep 30
+
+      - name: Publish fusabi-tui-render
+        if: ${{ inputs.dry_run != 'true' }}
+        run: cargo publish -p fusabi-tui-render --token ${{ secrets.CARGO_TOKEN }}
+        continue-on-error: true
+
+      - name: Publish fusabi-tui-widgets
+        if: ${{ inputs.dry_run != 'true' }}
+        run: cargo publish -p fusabi-tui-widgets --token ${{ secrets.CARGO_TOKEN }}
+        continue-on-error: true
+
+      - name: Wait for crates.io index
+        if: ${{ inputs.dry_run != 'true' }}
+        run: sleep 30
+
+      - name: Publish fusabi-tui-engine
+        if: ${{ inputs.dry_run != 'true' }}
+        run: cargo publish -p fusabi-tui-engine --token ${{ secrets.CARGO_TOKEN }}
+        continue-on-error: true
+
+      - name: Publish fusabi-tui-scarab
+        if: ${{ inputs.dry_run != 'true' }}
+        run: cargo publish -p fusabi-tui-scarab --token ${{ secrets.CARGO_TOKEN }}
+        continue-on-error: true
+
+      # Dry run mode
+      - name: Dry run - fusabi-tui-core
+        if: ${{ inputs.dry_run == 'true' }}
+        run: cargo publish -p fusabi-tui-core --dry-run
+
+      - name: Dry run - fusabi-tui-render
+        if: ${{ inputs.dry_run == 'true' }}
+        run: cargo publish -p fusabi-tui-render --dry-run
+
+      - name: Dry run - fusabi-tui-widgets
+        if: ${{ inputs.dry_run == 'true' }}
+        run: cargo publish -p fusabi-tui-widgets --dry-run
+
+      - name: Dry run - fusabi-tui-engine
+        if: ${{ inputs.dry_run == 'true' }}
+        run: cargo publish -p fusabi-tui-engine --dry-run
+
+      - name: Dry run - fusabi-tui-scarab
+        if: ${{ inputs.dry_run == 'true' }}
+        run: cargo publish -p fusabi-tui-scarab --dry-run
