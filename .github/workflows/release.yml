@@ -41,12 +41,22 @@ jobs:
           cargo test --workspace --lib
 
       # Publish in dependency order with delays for index updates
+      # Order: core -> widgets -> render -> engine, scarab
       - name: Publish fusabi-tui-core
         if: ${{ inputs.dry_run != 'true' }}
         run: cargo publish -p fusabi-tui-core --token ${{ secrets.CARGO_TOKEN }}
         continue-on-error: true
 
-      - name: Wait for crates.io index
+      - name: Wait for crates.io index (1)
+        if: ${{ inputs.dry_run != 'true' }}
+        run: sleep 30
+
+      - name: Publish fusabi-tui-widgets
+        if: ${{ inputs.dry_run != 'true' }}
+        run: cargo publish -p fusabi-tui-widgets --token ${{ secrets.CARGO_TOKEN }}
+        continue-on-error: true
+
+      - name: Wait for crates.io index (2)
         if: ${{ inputs.dry_run != 'true' }}
         run: sleep 30
 
@@ -55,12 +65,7 @@ jobs:
         run: cargo publish -p fusabi-tui-render --token ${{ secrets.CARGO_TOKEN }}
         continue-on-error: true
 
-      - name: Publish fusabi-tui-widgets
-        if: ${{ inputs.dry_run != 'true' }}
-        run: cargo publish -p fusabi-tui-widgets --token ${{ secrets.CARGO_TOKEN }}
-        continue-on-error: true
-
-      - name: Wait for crates.io index
+      - name: Wait for crates.io index (3)
         if: ${{ inputs.dry_run != 'true' }}
         run: sleep 30
 
@@ -79,13 +84,13 @@ jobs:
         if: ${{ inputs.dry_run == 'true' }}
         run: cargo publish -p fusabi-tui-core --dry-run
 
-      - name: Dry run - fusabi-tui-render
-        if: ${{ inputs.dry_run == 'true' }}
-        run: cargo publish -p fusabi-tui-render --dry-run
-
       - name: Dry run - fusabi-tui-widgets
         if: ${{ inputs.dry_run == 'true' }}
         run: cargo publish -p fusabi-tui-widgets --dry-run
+
+      - name: Dry run - fusabi-tui-render
+        if: ${{ inputs.dry_run == 'true' }}
+        run: cargo publish -p fusabi-tui-render --dry-run
 
       - name: Dry run - fusabi-tui-engine
         if: ${{ inputs.dry_run == 'true' }}
