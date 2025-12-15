@@ -31,6 +31,8 @@ Core TUI primitives providing foundational types:
 ### fusabi-tui-render
 
 Renderer abstraction layer supporting multiple backends:
+- `Terminal<R>` - High-level terminal wrapper (matches ratatui's API)
+- `Frame` - Frame for rendering widgets within draw callback
 - `Renderer` trait - Backend-agnostic rendering interface
 - `CrosstermRenderer` - Standalone terminal rendering via crossterm
 - `ScarabRenderer` - Shared memory rendering for Scarab plugins
@@ -95,22 +97,104 @@ scarab-daemon --load-plugin ./target/release/my-plugin.fzb
 ### Manual Rust Integration
 
 ```rust
-use fusabi_tui_core::{Buffer, Rect};
-use fusabi_tui_render::CrosstermRenderer;
-use fusabi_tui_widgets::Text;
+use fusabi_tui_render::prelude::*;
+use fusabi_tui_widgets::paragraph::Paragraph;
+use std::io;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut renderer = CrosstermRenderer::new()?;
-    let mut buffer = Buffer::empty(Rect::new(0, 0, 80, 24));
+    // Create crossterm-backed terminal
+    let renderer = CrosstermRenderer::new(io::stdout())?;
+    let mut terminal = Terminal::new(renderer)?;
 
-    // Your rendering logic here
-    let text = Text::new("Hello, Fusabi TUI!");
-    text.render(Rect::new(0, 0, 80, 1), &mut buffer);
+    // Draw using Frame (matches ratatui's API pattern)
+    terminal.draw(|frame| {
+        let area = frame.size();
+        let greeting = Paragraph::new("Hello, Fusabi TUI!");
+        frame.render_widget(greeting, area);
+    })?;
 
-    renderer.render(&buffer)?;
     Ok(())
 }
 ```
+
+### Low-Level Buffer Access
+
+For fine-grained control, you can work directly with buffers:
+
+```rust
+use fusabi_tui_core::{buffer::Buffer, layout::Rect, style::Style};
+use fusabi_tui_render::prelude::*;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut renderer = CrosstermRenderer::new(std::io::stdout())?;
+    let mut buffer = Buffer::new(Rect::new(0, 0, 80, 24));
+
+    // Direct buffer manipulation
+    buffer.set_string(0, 0, "Direct buffer access", Style::default());
+
+    renderer.draw(&buffer)?;
+    renderer.flush()?;
+    Ok(())
+}
+```
+
+## Migrating from Ratatui
+
+fusabi-tui-runtime provides a compatible API for projects migrating from ratatui:
+
+### Import Changes
+
+```rust
+// Before (ratatui)
+use ratatui::{Terminal, Frame};
+use ratatui::backend::CrosstermBackend;
+use ratatui::layout::{Constraint, Direction, Layout, Rect};
+use ratatui::style::{Color, Modifier, Style};
+use ratatui::widgets::{Block, Borders, Paragraph, Tabs};
+
+// After (fusabi-tui-runtime)
+use fusabi_tui_render::prelude::*;
+use fusabi_tui_render::Terminal;
+use fusabi_tui_core::layout::{Constraint, Direction, Layout, Rect};
+use fusabi_tui_core::style::{Color, Modifier, Style};
+use fusabi_tui_widgets::{
+    block::Block, borders::Borders, paragraph::Paragraph, tabs::Tabs,
+};
+```
+
+### Terminal Setup
+
+```rust
+// Before (ratatui)
+let stdout = io::stdout();
+let backend = CrosstermBackend::new(stdout);
+let mut terminal = Terminal::new(backend)?;
+
+// After (fusabi-tui-runtime)
+let renderer = CrosstermRenderer::new(io::stdout())?;
+let mut terminal = Terminal::new(renderer)?;
+```
+
+### Draw Pattern (unchanged)
+
+The draw pattern is identical:
+
+```rust
+terminal.draw(|frame| {
+    let area = frame.size();
+    let widget = Paragraph::new("Hello!");
+    frame.render_widget(widget, area);
+})?;
+```
+
+### Key Differences
+
+| ratatui | fusabi-tui-runtime | Notes |
+|---------|-------------------|-------|
+| `CrosstermBackend` | `CrosstermRenderer` | Same functionality |
+| `backend_mut()` | `backend_mut().writer_mut()` | Access underlying writer |
+| `Color::Gray` | `Color::DarkGray` | Color naming |
+| `Widget::render(self, ...)` | `Widget::render(&self, ...)` | Takes reference |
 
 ## Build Instructions
 
@@ -245,10 +329,21 @@ pub struct Cell {
 |-----------|--------|
 | Documentation | Complete |
 | Core Types | Implemented |
-| Renderers | In Progress |
-| Widget System | In Progress |
+| Renderers | Implemented (Crossterm, Test) |
+| Terminal/Frame API | Implemented |
+| Widget System | Implemented |
 | Hot Reload Engine | In Progress |
 | Scarab Backend | In Progress |
+
+### Migrated Projects
+
+| Project | Status | PR |
+|---------|--------|-----|
+| Hibana | Complete | [#27](https://github.com/raibid-labs/hibana/pull/27) |
+| Scryforge | Complete | Uses crates.io |
+| Phage | Complete | Uses crates.io |
+| Sigilforge | Complete | Uses crates.io |
+| Scarab | Complete | Uses crates.io |
 
 ## Related Projects
 

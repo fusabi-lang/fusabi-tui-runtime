@@ -171,6 +171,7 @@ version = "0.1.0"
 dependencies = [
  "crossterm",
  "fusabi-tui-core",
+ "fusabi-tui-widgets",
  "thiserror",
 ]
 

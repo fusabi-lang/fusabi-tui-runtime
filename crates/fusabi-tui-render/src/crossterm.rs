@@ -53,6 +53,18 @@ impl<W: Write + Send> CrosstermRenderer<W> {
         }
     }
 
+    /// Gets a mutable reference to the underlying writer.
+    ///
+    /// This is useful for executing crossterm commands directly.
+    pub fn writer_mut(&mut self) -> &mut W {
+        &mut self.writer
+    }
+
+    /// Gets a reference to the underlying writer.
+    pub fn writer(&self) -> &W {
+        &self.writer
+    }
+
     /// Converts a fusabi-tui Color to a crossterm Color.
     fn convert_color(color: Color) -> crossterm::style::Color {
         use crossterm::style::Color as CColor;
