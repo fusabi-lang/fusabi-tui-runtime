@@ -5,10 +5,14 @@
 
 use std::fmt;
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 /// Represents a color in the terminal.
 ///
 /// Supports both standard ANSI colors and extended 256-color/RGB modes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Color {
     /// Black color (ANSI 0)
     Black,
@@ -86,6 +90,7 @@ impl fmt::Display for Color {
 ///
 /// These can be combined using bitwise operations.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Modifier(u16);
 
 impl Modifier {
@@ -214,6 +219,7 @@ impl std::ops::Not for Modifier {
 ///     .add_modifier(Modifier::BOLD);
 /// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Style {
     /// Foreground color
     pub fg: Option<Color>,
