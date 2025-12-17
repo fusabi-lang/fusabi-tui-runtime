@@ -323,7 +323,38 @@ match engine.load(Path::new("dashboard.fsx")) {
 
 ## Testing
 
-The engine is designed to be testable:
+The engine provides comprehensive testing support through integration with `ratatui-testlib`:
+
+### Integration Testing
+
+Test full TUI applications with PTY-based harness:
+
+```rust
+use fusabi_tui_test::{FusabiTuiHarness, FusabiExampleBuilder};
+
+#[test]
+fn test_basic_app() -> Result<(), Box<dyn std::error::Error>> {
+    let mut harness = FusabiTuiHarness::new(80, 24)?;
+    let cmd = FusabiExampleBuilder::new("basic_app").build();
+    harness.spawn(cmd)?;
+
+    // Wait for UI to render
+    harness.wait_for_title("Fusabi TUI")?;
+
+    // Verify content
+    harness.assert_contains("Welcome")?;
+
+    // Simulate input
+    harness.send_char('q')?;
+    harness.wait_for_exit()?;
+
+    Ok(())
+}
+```
+
+### Unit Testing
+
+Test individual components:
 
 ```rust
 use fusabi_tui_engine::prelude::*;
@@ -334,17 +365,35 @@ use std::path::PathBuf;
 fn test_engine() {
     let renderer = TestRenderer::new(80, 24);
     let mut engine = DashboardEngine::new(renderer, PathBuf::from("."));
-    
+
     // Test loading
     assert!(engine.load(Path::new("test_dashboard.fsx")).is_ok());
-    
+
     // Test state
     assert!(engine.state().loaded);
-    
+
     // Test rendering
     assert!(engine.render().is_ok());
 }
 ```
+
+### Running Tests
+
+```bash
+# Run all tests
+cargo test
+
+# Run integration tests
+cargo test --test basic_app_test
+cargo test --test dashboard_test
+
+# Run with output
+cargo test -- --nocapture
+```
+
+For more details, see:
+- [Testing Guide](../../docs/TESTING.md) - Comprehensive testing documentation
+- [Test Module README](tests/README.md) - API reference and examples
 
 ## Integration with Other Crates
 
