@@ -11,6 +11,7 @@ use fusabi_tui_core::{
 };
 use unicode_width::UnicodeWidthStr;
 
+use crate::block::Block;
 use crate::widget::Widget;
 
 /// Set of characters used to render a gauge.
@@ -65,6 +66,7 @@ pub struct Gauge {
     style: Style,
     gauge_style: Style,
     char_set: GaugeCharSet,
+    block: Option<Block>,
 }
 
 impl Default for Gauge {
@@ -75,6 +77,7 @@ impl Default for Gauge {
             style: Style::default(),
             gauge_style: Style::default(),
             char_set: GaugeCharSet::Full,
+            block: None,
         }
     }
 }
@@ -83,6 +86,13 @@ impl Gauge {
     /// Creates a new gauge with default values.
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Wraps the gauge in a block.
+    #[must_use]
+    pub fn block(mut self, block: Block) -> Self {
+        self.block = Some(block);
+        self
     }
 
     /// Sets the ratio of the gauge (0.0 to 1.0).
@@ -141,11 +151,23 @@ impl Widget for Gauge {
             return;
         }
 
+        // Render block and get inner area
+        let inner_area = if let Some(ref block) = self.block {
+            block.render(area, buf);
+            block.inner(area)
+        } else {
+            area
+        };
+
+        if inner_area.area() == 0 {
+            return;
+        }
+
         // Only use the first row
         let gauge_area = Rect {
-            x: area.x,
-            y: area.y,
-            width: area.width,
+            x: inner_area.x,
+            y: inner_area.y,
+            width: inner_area.width,
             height: 1,
         };
 
