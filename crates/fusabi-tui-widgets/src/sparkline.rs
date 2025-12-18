@@ -10,6 +10,7 @@ use fusabi_tui_core::{
     symbols::bar,
 };
 
+use crate::block::Block;
 use crate::widget::Widget;
 
 /// Set of bar characters to use for rendering sparklines.
@@ -68,6 +69,7 @@ pub struct Sparkline {
     max: Option<u64>,
     style: Style,
     bar_set: SparklineBarSet,
+    block: Option<Block>,
 }
 
 impl Default for Sparkline {
@@ -77,6 +79,7 @@ impl Default for Sparkline {
             max: None,
             style: Style::default(),
             bar_set: SparklineBarSet::Unicode,
+            block: None,
         }
     }
 }
@@ -85,6 +88,13 @@ impl Sparkline {
     /// Creates a new sparkline with default values.
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Wraps the sparkline in a block.
+    #[must_use]
+    pub fn block(mut self, block: Block) -> Self {
+        self.block = Some(block);
+        self
     }
 
     /// Sets the data points for the sparkline.
@@ -134,15 +144,27 @@ impl Sparkline {
 
 impl Widget for Sparkline {
     fn render(&self, area: Rect, buf: &mut Buffer) {
-        if area.area() == 0 || self.data.is_empty() {
+        if area.area() == 0 {
+            return;
+        }
+
+        // Render block and get inner area
+        let inner_area = if let Some(ref block) = self.block {
+            block.render(area, buf);
+            block.inner(area)
+        } else {
+            area
+        };
+
+        if inner_area.area() == 0 || self.data.is_empty() {
             return;
         }
 
         // Only use the first row
         let sparkline_area = Rect {
-            x: area.x,
-            y: area.y,
-            width: area.width,
+            x: inner_area.x,
+            y: inner_area.y,
+            width: inner_area.width,
             height: 1,
         };
 
