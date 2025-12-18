@@ -1,6 +1,6 @@
 [package]
 name = "fusabi-tui-scarab"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 description = "Scarab shared memory backend for Fusabi TUI"
 license = "MIT OR Apache-2.0"
@@ -12,8 +12,8 @@ categories = ["command-line-interface", "rendering"]
 
 [dependencies]
 # Internal dependencies
-fusabi-tui-core = { path = "../fusabi-tui-core", version = "0.1.1" }
-fusabi-tui-render = { path = "../fusabi-tui-render", version = "0.1.1" }
+fusabi-tui-core = { path = "../fusabi-tui-core", version = "0.2.0" }
+fusabi-tui-render = { path = "../fusabi-tui-render", version = "0.2.0" }
 
 # Shared memory IPC
 shared_memory = "0.12"

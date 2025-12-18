@@ -1,6 +1,6 @@
 [package]
 name = "fusabi-tui-widgets"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 description = "Widget library for Fusabi TUI"
 license = "MIT OR Apache-2.0"
@@ -11,6 +11,6 @@ keywords = ["tui", "terminal", "fusabi", "widgets", "ui"]
 categories = ["command-line-interface", "gui"]
 
 [dependencies]
-fusabi-tui-core = { path = "../fusabi-tui-core", version = "0.1.1" }
+fusabi-tui-core = { path = "../fusabi-tui-core", version = "0.2.0" }
 unicode-width = "0.1"
 bitflags = "2.4"

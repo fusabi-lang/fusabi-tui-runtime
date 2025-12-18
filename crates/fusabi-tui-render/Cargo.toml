@@ -1,6 +1,6 @@
 [package]
 name = "fusabi-tui-render"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 description = "Renderer abstraction for Fusabi TUI"
 license = "MIT OR Apache-2.0"
@@ -11,8 +11,8 @@ keywords = ["tui", "terminal", "fusabi", "renderer", "backend"]
 categories = ["command-line-interface", "rendering"]
 
 [dependencies]
-fusabi-tui-core = { path = "../fusabi-tui-core", version = "0.1.1" }
-fusabi-tui-widgets = { path = "../fusabi-tui-widgets", version = "0.1.1" }
+fusabi-tui-core = { path = "../fusabi-tui-core", version = "0.2.0" }
+fusabi-tui-widgets = { path = "../fusabi-tui-widgets", version = "0.2.0" }
 crossterm = { version = "0.28", optional = true }
 thiserror = "1.0"
 
