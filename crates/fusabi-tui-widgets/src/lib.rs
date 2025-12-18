@@ -18,6 +18,7 @@
 //! - [`gauge`] - Gauge widget for progress bars
 //! - [`sparkline`] - Sparkline widget for inline mini-charts
 //! - [`tabs`] - Tabs widget for tab navigation
+//! - [`scrollbar`] - Scrollbar widget for scrollable content indicators
 //! - [`barchart`] - BarChart widget for bar chart visualizations
 //!
 //! # Quick Start
@@ -60,9 +61,11 @@
 pub mod barchart;
 pub mod borders;
 pub mod block;
+pub mod clear;
 pub mod gauge;
 pub mod list;
 pub mod paragraph;
+pub mod scrollbar;
 pub mod sparkline;
 pub mod table;
 pub mod tabs;
@@ -73,9 +76,11 @@ pub mod widget;
 pub use barchart::{Bar, BarChart, BarGroup};
 pub use block::{Block, Padding, Title, TitleAlignment, TitlePosition};
 pub use borders::{BorderType, Borders};
+pub use clear::Clear;
 pub use gauge::{Gauge, GaugeCharSet};
 pub use list::{List, ListItem, ListState};
 pub use paragraph::{Alignment, Paragraph, Wrap};
+pub use scrollbar::{Scrollbar, ScrollbarOrientation, ScrollbarState};
 pub use sparkline::{Sparkline, SparklineBarSet};
 pub use table::{Row, Table, TableCell, TableState};
 pub use tabs::Tabs;
