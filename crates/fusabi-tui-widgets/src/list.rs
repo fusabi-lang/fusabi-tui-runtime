@@ -260,6 +260,13 @@ impl<'a> List<'a> {
     }
 }
 
+impl Widget for List<'_> {
+    fn render(&self, area: Rect, buf: &mut Buffer) {
+        let mut state = ListState::default();
+        StatefulWidget::render(self, area, buf, &mut state);
+    }
+}
+
 impl StatefulWidget for List<'_> {
     type State = ListState;
 
