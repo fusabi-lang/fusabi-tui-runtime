@@ -19,6 +19,7 @@
 //! - [`sparkline`] - Sparkline widget for inline mini-charts
 //! - [`tabs`] - Tabs widget for tab navigation
 //! - [`scrollbar`] - Scrollbar widget for scrollable content indicators
+//! - [`barchart`] - BarChart widget for bar chart visualizations
 //!
 //! # Quick Start
 //!
@@ -57,6 +58,7 @@
 #![warn(clippy::pedantic)]
 #![allow(clippy::module_name_repetitions)]
 
+pub mod barchart;
 pub mod borders;
 pub mod block;
 pub mod clear;
@@ -71,6 +73,7 @@ pub mod text;
 pub mod widget;
 
 // Re-export commonly used types at the crate root for convenience
+pub use barchart::{Bar, BarChart, BarGroup};
 pub use block::{Block, Padding, Title, TitleAlignment, TitlePosition};
 pub use borders::{BorderType, Borders};
 pub use clear::Clear;
