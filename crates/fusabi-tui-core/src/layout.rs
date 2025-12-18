@@ -5,6 +5,70 @@
 
 use std::cmp::{max, min};
 
+/// Margin values for creating inner rectangles.
+///
+/// Represents spacing around the edges of a rectangle. Margins can be asymmetric,
+/// with different values for horizontal (left/right) and vertical (top/bottom) spacing.
+///
+/// # Examples
+///
+/// ```
+/// use fusabi_tui_core::layout::Margin;
+///
+/// // Asymmetric margins: 2 units horizontal, 1 unit vertical
+/// let margin = Margin::new(2, 1);
+///
+/// // Symmetric margins: 3 units on all sides
+/// let margin = Margin::symmetric(3);
+/// ```
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub struct Margin {
+    /// Horizontal margin (applies to left and right sides)
+    pub horizontal: u16,
+    /// Vertical margin (applies to top and bottom sides)
+    pub vertical: u16,
+}
+
+impl Margin {
+    /// Creates a new margin with the given horizontal and vertical values.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use fusabi_tui_core::layout::Margin;
+    ///
+    /// let margin = Margin::new(5, 3);
+    /// assert_eq!(margin.horizontal, 5);
+    /// assert_eq!(margin.vertical, 3);
+    /// ```
+    #[inline]
+    pub const fn new(horizontal: u16, vertical: u16) -> Self {
+        Self {
+            horizontal,
+            vertical,
+        }
+    }
+
+    /// Creates a symmetric margin with the same value for all sides.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use fusabi_tui_core::layout::Margin;
+    ///
+    /// let margin = Margin::symmetric(4);
+    /// assert_eq!(margin.horizontal, 4);
+    /// assert_eq!(margin.vertical, 4);
+    /// ```
+    #[inline]
+    pub const fn symmetric(value: u16) -> Self {
+        Self {
+            horizontal: value,
+            vertical: value,
+        }
+    }
+}
+
 /// A rectangular area in the terminal.
 ///
 /// Coordinates are 0-indexed, with (0, 0) at the top-left corner.
@@ -64,17 +128,31 @@ impl Rect {
 
     /// Returns a new rectangle with the given margin applied.
     ///
-    /// The margin is applied to all sides, reducing the width and height by 2× the margin.
-    pub fn inner(self, margin: u16) -> Self {
-        let doubled_margin = margin.saturating_mul(2);
-        if self.width < doubled_margin || self.height < doubled_margin {
+    /// The margin reduces the rectangle size by removing space from each side.
+    /// Horizontal margin is applied to both left and right sides,
+    /// vertical margin is applied to both top and bottom sides.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use fusabi_tui_core::layout::{Rect, Margin};
+    ///
+    /// let rect = Rect::new(0, 0, 10, 10);
+    /// let inner = rect.inner(Margin::new(2, 1));
+    /// assert_eq!(inner, Rect::new(2, 1, 6, 8));
+    /// ```
+    pub fn inner(self, margin: Margin) -> Self {
+        let doubled_horizontal = margin.horizontal.saturating_mul(2);
+        let doubled_vertical = margin.vertical.saturating_mul(2);
+
+        if self.width < doubled_horizontal || self.height < doubled_vertical {
             Self::default()
         } else {
             Self {
-                x: self.x.saturating_add(margin),
-                y: self.y.saturating_add(margin),
-                width: self.width.saturating_sub(doubled_margin),
-                height: self.height.saturating_sub(doubled_margin),
+                x: self.x.saturating_add(margin.horizontal),
+                y: self.y.saturating_add(margin.vertical),
+                width: self.width.saturating_sub(doubled_horizontal),
+                height: self.height.saturating_sub(doubled_vertical),
             }
         }
     }
@@ -240,7 +318,7 @@ impl Layout {
     ///
     /// Returns a vector of rectangles, one for each constraint.
     pub fn split(&self, area: Rect) -> Vec<Rect> {
-        let area = area.inner(self.margin);
+        let area = area.inner(Margin::symmetric(self.margin));
 
         if self.constraints.is_empty() {
             return vec![area];
@@ -367,7 +445,7 @@ mod tests {
     #[test]
     fn test_rect_inner() {
         let rect = Rect::new(0, 0, 10, 10);
-        let inner = rect.inner(1);
+        let inner = rect.inner(Margin::symmetric(1));
         assert_eq!(inner.x, 1);
         assert_eq!(inner.y, 1);
         assert_eq!(inner.width, 8);
@@ -377,7 +455,45 @@ mod tests {
     #[test]
     fn test_rect_inner_too_small() {
         let rect = Rect::new(0, 0, 3, 3);
-        let inner = rect.inner(2);
+        let inner = rect.inner(Margin::symmetric(2));
+        assert_eq!(inner, Rect::default());
+    }
+
+    #[test]
+    fn test_margin_new() {
+        let margin = Margin::new(5, 3);
+        assert_eq!(margin.horizontal, 5);
+        assert_eq!(margin.vertical, 3);
+    }
+
+    #[test]
+    fn test_margin_symmetric() {
+        let margin = Margin::symmetric(4);
+        assert_eq!(margin.horizontal, 4);
+        assert_eq!(margin.vertical, 4);
+    }
+
+    #[test]
+    fn test_rect_inner_asymmetric() {
+        let rect = Rect::new(0, 0, 10, 10);
+        let inner = rect.inner(Margin::new(2, 1));
+        assert_eq!(inner.x, 2);
+        assert_eq!(inner.y, 1);
+        assert_eq!(inner.width, 6);
+        assert_eq!(inner.height, 8);
+    }
+
+    #[test]
+    fn test_rect_inner_asymmetric_too_small_width() {
+        let rect = Rect::new(0, 0, 3, 10);
+        let inner = rect.inner(Margin::new(2, 1));
+        assert_eq!(inner, Rect::default());
+    }
+
+    #[test]
+    fn test_rect_inner_asymmetric_too_small_height() {
+        let rect = Rect::new(0, 0, 10, 3);
+        let inner = rect.inner(Margin::new(1, 2));
         assert_eq!(inner, Rect::default());
     }
 

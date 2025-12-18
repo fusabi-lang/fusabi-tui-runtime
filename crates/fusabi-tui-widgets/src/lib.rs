@@ -59,6 +59,7 @@
 
 pub mod borders;
 pub mod block;
+pub mod clear;
 pub mod gauge;
 pub mod list;
 pub mod paragraph;
@@ -72,6 +73,7 @@ pub mod widget;
 // Re-export commonly used types at the crate root for convenience
 pub use block::{Block, Padding, Title, TitleAlignment, TitlePosition};
 pub use borders::{BorderType, Borders};
+pub use clear::Clear;
 pub use gauge::{Gauge, GaugeCharSet};
 pub use list::{List, ListItem, ListState};
 pub use paragraph::{Alignment, Paragraph, Wrap};
