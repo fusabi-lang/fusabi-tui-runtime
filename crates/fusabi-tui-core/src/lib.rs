@@ -74,6 +74,6 @@ pub mod theme;
 
 // Re-export commonly used types at the crate root for convenience
 pub use buffer::{Buffer, Cell};
-pub use layout::{Constraint, Direction, Layout, Rect};
+pub use layout::{Constraint, Direction, Layout, Margin, Rect};
 pub use style::{Color, Modifier, Style};
 pub use theme::{ColorPalette, StyleMap, Theme};
