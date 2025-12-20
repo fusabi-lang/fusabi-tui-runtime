@@ -3,10 +3,18 @@
 use crate::error::{EngineError, EngineResult};
 use crate::event::{Action, Event};
 use crate::loader::FileLoader;
+use crate::overlay::ErrorOverlay;
 use crate::state::DashboardState;
 use crate::watcher::FileWatcher;
 use fusabi_tui_core::buffer::Buffer;
+use fusabi_tui_core::layout::Rect;
+use fusabi_tui_core::style::{Color, Modifier, Style};
 use fusabi_tui_render::renderer::Renderer;
+use fusabi_tui_widgets::block::Block;
+use fusabi_tui_widgets::borders::{BorderType, Borders};
+use fusabi_tui_widgets::paragraph::Paragraph;
+// Text types for paragraphs
+use fusabi_tui_widgets::widget::Widget;
 use std::path::{Path, PathBuf};
 
 /// The main dashboard engine that orchestrates hot reloading and rendering.
@@ -35,6 +43,13 @@ pub struct DashboardEngine<R: Renderer> {
 
     /// The entry file path (main dashboard file).
     entry_file: Option<PathBuf>,
+
+    /// Error overlay for displaying errors during development.
+    error_overlay: Option<ErrorOverlay>,
+
+    /// Callback for widget rendering (set by Fusabi integration).
+    /// This allows external code to provide the actual rendering logic.
+    render_callback: Option<Box<dyn Fn(&mut Buffer, Rect, &DashboardState) + Send + Sync>>,
 }
 
 impl<R: Renderer> DashboardEngine<R> {
@@ -63,7 +78,69 @@ impl<R: Renderer> DashboardEngine<R> {
             state: DashboardState::new(),
             root_path,
             entry_file: None,
+            error_overlay: None,
+            render_callback: None,
         }
+    }
+
+    /// Set a custom render callback for widget rendering.
+    ///
+    /// This is used by Fusabi integration to provide the actual widget rendering logic
+    /// from evaluated scripts. The callback receives the buffer, render area, and current state.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use fusabi_tui_engine::dashboard::DashboardEngine;
+    /// # use fusabi_tui_render::test::TestRenderer;
+    /// # use std::path::PathBuf;
+    /// # let renderer = TestRenderer::new(80, 24);
+    /// # let mut engine = DashboardEngine::new(renderer, PathBuf::from("."));
+    /// engine.set_render_callback(|buffer, area, state| {
+    ///     // Custom widget rendering logic here
+    ///     // This would typically render widgets from evaluated Fusabi scripts
+    /// });
+    /// ```
+    pub fn set_render_callback<F>(&mut self, callback: F)
+    where
+        F: Fn(&mut Buffer, Rect, &DashboardState) + Send + Sync + 'static,
+    {
+        self.render_callback = Some(Box::new(callback));
+    }
+
+    /// Clear the render callback.
+    pub fn clear_render_callback(&mut self) {
+        self.render_callback = None;
+    }
+
+    /// Set an error to be displayed as an overlay.
+    ///
+    /// This is useful for displaying compilation or runtime errors to the user
+    /// without crashing the application.
+    pub fn show_error(&mut self, error: &EngineError) {
+        self.error_overlay = Some(ErrorOverlay::from_engine_error(error));
+        self.state.mark_dirty();
+    }
+
+    /// Dismiss the current error overlay.
+    pub fn dismiss_error(&mut self) {
+        if self.error_overlay.is_some() {
+            self.error_overlay = None;
+            self.state.mark_dirty();
+        }
+    }
+
+    /// Check if an error overlay is currently displayed.
+    pub fn has_error(&self) -> bool {
+        self.error_overlay
+            .as_ref()
+            .map(|o| o.is_visible())
+            .unwrap_or(false)
+    }
+
+    /// Get a reference to the error overlay if one exists.
+    pub fn error_overlay(&self) -> Option<&ErrorOverlay> {
+        self.error_overlay.as_ref()
     }
 
     /// Load a dashboard file.
@@ -156,6 +233,11 @@ impl<R: Renderer> DashboardEngine<R> {
     /// This creates a buffer, renders the current state to it, and flushes
     /// to the renderer backend.
     ///
+    /// The render method follows this order:
+    /// 1. If a render callback is set, use it for widget rendering
+    /// 2. Otherwise, render a default placeholder
+    /// 3. If an error overlay is active, render it on top
+    ///
     /// # Errors
     ///
     /// Returns an error if rendering fails.
@@ -164,15 +246,28 @@ impl<R: Renderer> DashboardEngine<R> {
         let size = self.renderer.size()?;
 
         // Create a buffer for the current frame
-        let buffer = Buffer::new(size);
+        let mut buffer = Buffer::new(size);
 
-        // TODO: Render widgets from state to buffer
-        // This would involve:
-        // 1. Iterating over widgets in state
-        // 2. Calling widget.render() on each
-        // 3. Drawing to the buffer
-        //
-        // For now, we just have an empty buffer
+        // Render content based on available render callback
+        if let Some(callback) = &self.render_callback {
+            // Use the custom render callback (typically from Fusabi integration)
+            callback(&mut buffer, size, &self.state);
+        } else if self.entry_file.is_some() {
+            // Render a loading/ready placeholder when a file is loaded
+            // but no render callback is set yet
+            self.render_placeholder(&mut buffer, size);
+        } else {
+            // Render an empty state placeholder
+            self.render_empty_state(&mut buffer, size);
+        }
+
+        // Render error overlay if present
+        if let Some(overlay) = &mut self.error_overlay {
+            overlay.update();
+            if overlay.is_visible() {
+                overlay.render(size, &mut buffer);
+            }
+        }
 
         // Draw the buffer to the renderer
         self.renderer.draw(&buffer)?;
@@ -182,6 +277,73 @@ impl<R: Renderer> DashboardEngine<R> {
         self.state.clear_dirty();
 
         Ok(())
+    }
+
+    /// Render a placeholder when a file is loaded but no render callback is set.
+    fn render_placeholder(&self, buffer: &mut Buffer, area: Rect) {
+        use fusabi_tui_widgets::block::Title;
+
+        let entry_file = self.entry_file.as_ref().map(|p| p.display().to_string())
+            .unwrap_or_else(|| "unknown".to_string());
+
+        let title = Title::new(" Fusabi Dashboard ")
+            .style(Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD));
+
+        let block = Block::default()
+            .title(title)
+            .borders(Borders::ALL)
+            .border_type(BorderType::Rounded)
+            .border_style(Style::default().fg(Color::Cyan));
+
+        let inner = block.inner(area);
+        block.render(area, buffer);
+
+        // Show file info
+        let info_text = format!(
+            "Loaded: {}\n\n\
+             Hot reload: {}\n\
+             Widgets: {}\n\n\
+             Waiting for Fusabi render callback...\n\n\
+             Press Ctrl+R to reload, Ctrl+C to quit",
+            entry_file,
+            if self.watcher.is_some() { "enabled" } else { "disabled" },
+            self.state.widgets.len()
+        );
+
+        let para = Paragraph::new(info_text)
+            .style(Style::default().fg(Color::White));
+        para.render(inner, buffer);
+    }
+
+    /// Render an empty state when no file is loaded.
+    fn render_empty_state(&self, buffer: &mut Buffer, area: Rect) {
+        use fusabi_tui_widgets::block::Title;
+
+        let title = Title::new(" Fusabi Dashboard Engine ")
+            .style(Style::default().fg(Color::Blue).add_modifier(Modifier::BOLD));
+
+        let block = Block::default()
+            .title(title)
+            .borders(Borders::ALL)
+            .border_type(BorderType::Double)
+            .border_style(Style::default().fg(Color::Blue));
+
+        let inner = block.inner(area);
+        block.render(area, buffer);
+
+        let info_text = "\
+            No dashboard loaded.\n\n\
+            Use engine.load(path) to load a .fsx dashboard file.\n\n\
+            Features:\n\
+              - Hot reload with file watching\n\
+              - Fusabi script integration\n\
+              - Widget state management\n\
+              - Error overlay for debugging\n\n\
+            Press Ctrl+C to quit";
+
+        let para = Paragraph::new(info_text)
+            .style(Style::default().fg(Color::DarkGray));
+        para.render(inner, buffer);
     }
 
     /// Enable hot reload functionality.
@@ -285,6 +447,14 @@ impl<R: Renderer> DashboardEngine<R> {
             if key_event.code == KeyCode::Char('r') && key_event.modifiers.ctrl {
                 self.reload()?;
                 return Ok(Action::Render);
+            }
+
+            // Ctrl+D to dismiss error overlay
+            if key_event.code == KeyCode::Char('d') && key_event.modifiers.ctrl {
+                if self.has_error() {
+                    self.dismiss_error();
+                    return Ok(Action::Render);
+                }
             }
         }
 

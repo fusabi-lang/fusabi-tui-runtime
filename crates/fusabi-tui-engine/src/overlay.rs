@@ -2,11 +2,11 @@
 
 use crate::error::EngineError;
 use fusabi_tui_core::buffer::Buffer;
-use fusabi_tui_core::layout::{Alignment, Constraint, Direction, Layout, Rect};
+use fusabi_tui_core::layout::Rect;
 use fusabi_tui_core::style::{Color, Modifier, Style};
-use fusabi_tui_widgets::block::{Block, BorderType, Borders};
+use fusabi_tui_widgets::block::Block;
+use fusabi_tui_widgets::borders::{BorderType, Borders};
 use fusabi_tui_widgets::paragraph::Paragraph;
-use fusabi_tui_widgets::text::{Line, Span, Text};
 use fusabi_tui_widgets::widget::Widget;
 use std::time::{Duration, Instant};
 
@@ -144,6 +144,8 @@ impl ErrorOverlay {
 
     /// Render the error panel content.
     fn render_error_panel(&self, area: Rect, buf: &mut Buffer) {
+        use fusabi_tui_widgets::block::Title;
+
         let error = &self.error;
 
         // Determine colors based on severity
@@ -153,25 +155,14 @@ impl ErrorOverlay {
             ErrorSeverity::Info => (Color::Blue, Color::Blue),
         };
 
+        // Create title string
+        let title_str = format!(" {}: {} ", error.severity.as_str(), error.title);
+        let title = Title::new(title_str)
+            .style(Style::default().fg(title_color).add_modifier(Modifier::BOLD));
+
         // Create the block with borders
         let block = Block::default()
-            .title(Line::from(vec![
-                Span::styled(" ", Style::default()),
-                Span::styled(
-                    error.severity.as_str(),
-                    Style::default()
-                        .fg(title_color)
-                        .add_modifier(Modifier::BOLD),
-                ),
-                Span::styled(": ", Style::default().fg(Color::White)),
-                Span::styled(
-                    &error.title,
-                    Style::default()
-                        .fg(Color::White)
-                        .add_modifier(Modifier::BOLD),
-                ),
-                Span::styled(" ", Style::default()),
-            ]))
+            .title(title)
             .borders(Borders::ALL)
             .border_type(BorderType::Rounded)
             .border_style(Style::default().fg(border_color))
@@ -180,104 +171,39 @@ impl ErrorOverlay {
         let inner = block.inner(area);
         block.render(area, buf);
 
-        // Split the inner area into sections
-        let chunks = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints([
-                Constraint::Length(1), // Spacer
-                Constraint::Min(5),    // Error message
-                Constraint::Length(1), // Spacer
-                Constraint::Length(3), // Location info
-                Constraint::Length(1), // Spacer
-                Constraint::Min(0),    // Hints
-                Constraint::Length(2), // Footer
-            ])
-            .split(inner);
+        // Build content as a single string for simplicity
+        let mut content = String::new();
 
-        // Render error message
-        let mut message_text = Text::from(&error.message);
-        message_text.style = Style::default().fg(Color::White);
-        let message_para = Paragraph::new(message_text).alignment(Alignment::Left);
-        message_para.render(chunks[1], buf);
+        // Error message
+        content.push_str(&error.message);
+        content.push_str("\n\n");
 
-        // Render location info if available
+        // Location info if available
         if let Some(source) = &error.source {
-            let location_line = if let (Some(line), Some(col)) = (error.line, error.column) {
-                format!("  at {}:{}:{}", source, line, col)
+            if let (Some(line), Some(col)) = (error.line, error.column) {
+                content.push_str(&format!("Location: {}:{}:{}\n\n", source, line, col));
             } else if let Some(line) = error.line {
-                format!("  at {}:{}", source, line)
+                content.push_str(&format!("Location: {}:{}\n\n", source, line));
             } else {
-                format!("  in {}", source)
-            };
-
-            let location_text = Text::from(Line::from(vec![
-                Span::styled("Location:", Style::default().fg(Color::Gray)),
-                Span::raw(" "),
-                Span::styled(
-                    location_line,
-                    Style::default()
-                        .fg(Color::Cyan)
-                        .add_modifier(Modifier::ITALIC),
-                ),
-            ]));
-
-            let location_para = Paragraph::new(location_text).alignment(Alignment::Left);
-            location_para.render(chunks[3], buf);
-        }
-
-        // Render hints if available
-        if !error.hints.is_empty() {
-            let mut hints_lines = vec![Line::from(Span::styled(
-                "Hints:",
-                Style::default()
-                    .fg(Color::Green)
-                    .add_modifier(Modifier::BOLD),
-            ))];
-
-            for hint in &error.hints {
-                hints_lines.push(Line::from(vec![
-                    Span::raw("  "),
-                    Span::styled("•", Style::default().fg(Color::Green)),
-                    Span::raw(" "),
-                    Span::styled(hint, Style::default().fg(Color::White)),
-                ]));
+                content.push_str(&format!("Location: {}\n\n", source));
             }
-
-            let hints_text = Text::from(hints_lines);
-            let hints_para = Paragraph::new(hints_text).alignment(Alignment::Left);
-            hints_para.render(chunks[5], buf);
         }
 
-        // Render footer with instructions
-        let footer = Text::from(Line::from(vec![
-            Span::styled(
-                "Press ",
-                Style::default().fg(Color::Gray).add_modifier(Modifier::DIM),
-            ),
-            Span::styled(
-                "Ctrl+D",
-                Style::default()
-                    .fg(Color::Yellow)
-                    .add_modifier(Modifier::BOLD),
-            ),
-            Span::styled(
-                " to dismiss, ",
-                Style::default().fg(Color::Gray).add_modifier(Modifier::DIM),
-            ),
-            Span::styled(
-                "Ctrl+R",
-                Style::default()
-                    .fg(Color::Yellow)
-                    .add_modifier(Modifier::BOLD),
-            ),
-            Span::styled(
-                " to reload",
-                Style::default().fg(Color::Gray).add_modifier(Modifier::DIM),
-            ),
-        ]));
+        // Hints
+        if !error.hints.is_empty() {
+            content.push_str("Hints:\n");
+            for hint in &error.hints {
+                content.push_str(&format!("  * {}\n", hint));
+            }
+            content.push('\n');
+        }
 
-        let footer_para = Paragraph::new(footer).alignment(Alignment::Center);
-        footer_para.render(chunks[6], buf);
+        // Footer
+        content.push_str("Press Ctrl+D to dismiss, Ctrl+R to reload");
+
+        let para = Paragraph::new(content)
+            .style(Style::default().fg(Color::White));
+        para.render(inner, buf);
     }
 
     /// Helper function to create a centered rectangle.

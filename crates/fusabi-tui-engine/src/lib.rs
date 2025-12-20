@@ -100,7 +100,9 @@
 pub mod dashboard;
 pub mod error;
 pub mod event;
+pub mod fusabi_runtime;
 pub mod loader;
+pub mod overlay;
 pub mod state;
 pub mod watcher;
 
@@ -113,7 +115,9 @@ pub mod prelude {
     pub use crate::event::{
         Action, Event, KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind,
     };
+    pub use crate::fusabi_runtime::{FusabiContext, parse_load_directives};
     pub use crate::loader::{FileLoader, LoadedFile};
+    pub use crate::overlay::{ErrorMessage, ErrorOverlay, ErrorSeverity};
     pub use crate::state::{DashboardState, ListState, TableState, WidgetState};
     pub use crate::watcher::FileWatcher;
 }

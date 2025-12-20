@@ -7,6 +7,11 @@
 //! - Handling keyboard events
 //! - Clean shutdown
 
+use crossterm::{
+    event::{self, Event as CrosstermEvent, KeyCode as CrosstermKeyCode, KeyEventKind},
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+};
+use crossterm::ExecutableCommand;
 use fusabi_tui_core::{
     buffer::Buffer,
     layout::{Constraint, Direction, Layout, Rect},
@@ -54,9 +59,9 @@ impl App {
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints(&[
-                Constraint::Length(3),    // Header
-                Constraint::Fill(1),      // Body
-                Constraint::Length(3),    // Footer
+                Constraint::Length(3), // Header
+                Constraint::Fill(1),   // Body
+                Constraint::Length(3), // Footer
             ])
             .split(area);
 
@@ -97,24 +102,21 @@ impl App {
             Line::from(""),
             Line::from(vec![
                 Span::raw("Counter: "),
-                Span::styled(
-                    format!("{}", self.counter),
-                    Style::new().fg(Color::Yellow),
-                ),
+                Span::styled(format!("{}", self.counter), Style::new().fg(Color::Yellow)),
             ]),
             Line::from(vec![
                 Span::raw("Uptime: "),
-                Span::styled(
-                    format!("{}s", seconds),
-                    Style::new().fg(Color::Magenta),
-                ),
+                Span::styled(format!("{}s", seconds), Style::new().fg(Color::Magenta)),
             ]),
             Line::from(""),
             Line::from("This is a simple standalone TUI application."),
             Line::from(""),
             Line::from(vec![
                 Span::raw("Press "),
-                Span::styled("'q'", Style::new().fg(Color::Red).add_modifier(Modifier::BOLD)),
+                Span::styled(
+                    "'q'",
+                    Style::new().fg(Color::Red).add_modifier(Modifier::BOLD),
+                ),
                 Span::raw(" to quit"),
             ]),
         ]);
@@ -132,7 +134,7 @@ impl App {
     }
 
     fn render_footer(&self, buffer: &mut Buffer, area: Rect) {
-        let text = "fusabi-tui-runtime v0.1.0 | Standalone Mode";
+        let text = "fusabi-tui-runtime v0.2.0 | Standalone Mode";
         let paragraph = Paragraph::new(text)
             .block(Block::default().borders(Borders::ALL))
             .alignment(Alignment::Center)
@@ -142,9 +144,15 @@ impl App {
     }
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Initialize terminal
+fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
+    // Setup terminal
+    enable_raw_mode()?;
+    stdout().execute(EnterAlternateScreen)?;
+
+    // Initialize renderer
     let mut renderer = CrosstermRenderer::new(stdout())?;
+    renderer.show_cursor(false)?;
+
     let mut app = App::new();
 
     // Main loop
@@ -164,22 +172,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         renderer.draw(&buffer)?;
         renderer.flush()?;
 
-        // Handle events
+        // Handle events with timeout
         let timeout = tick_rate
             .checked_sub(last_tick.elapsed())
             .unwrap_or_else(|| Duration::from_secs(0));
 
-        if let Some(event) = renderer.poll_event(timeout) {
-            match event {
-                Event::Key(key_event) => {
-                    if let KeyCode::Char(c) = key_event.code {
+        if event::poll(timeout)? {
+            if let CrosstermEvent::Key(key) = event::read()? {
+                if key.kind == KeyEventKind::Press {
+                    if let CrosstermKeyCode::Char(c) = key.code {
                         app.on_key(c);
                     }
                 }
-                Event::Resize(_, _) => {
-                    // Terminal was resized, will re-render on next iteration
-                }
-                _ => {}
             }
         }
 
@@ -195,8 +199,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    // Cleanup
-    renderer.cleanup()?;
+    // Cleanup terminal
+    renderer.show_cursor(true)?;
+    stdout().execute(LeaveAlternateScreen)?;
+    disable_raw_mode()?;
+
     println!("Thanks for using fusabi-tui-runtime!");
 
     Ok(())

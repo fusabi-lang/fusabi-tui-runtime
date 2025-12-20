@@ -7,6 +7,11 @@
 //! - Event handling
 //! - State management
 
+use crossterm::{
+    event::{self, Event as CrosstermEvent, KeyCode as CrosstermKeyCode, KeyEventKind},
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+};
+use crossterm::ExecutableCommand;
 use fusabi_tui_core::{
     buffer::Buffer,
     layout::{Constraint, Direction, Layout, Rect},
@@ -83,9 +88,9 @@ impl Dashboard {
         let main_chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints(&[
-                Constraint::Length(3),    // Title
-                Constraint::Fill(1),      // Content
-                Constraint::Length(3),    // Footer
+                Constraint::Length(3), // Title
+                Constraint::Fill(1),   // Content
+                Constraint::Length(3), // Footer
             ])
             .split(area);
 
@@ -95,10 +100,7 @@ impl Dashboard {
         // Content layout: horizontal split
         let content_chunks = Layout::default()
             .direction(Direction::Horizontal)
-            .constraints(&[
-                Constraint::Percentage(50),
-                Constraint::Percentage(50),
-            ])
+            .constraints(&[Constraint::Percentage(50), Constraint::Percentage(50)])
             .split(main_chunks[1]);
 
         // Left panel
@@ -113,7 +115,10 @@ impl Dashboard {
 
     fn render_title(&self, buffer: &mut Buffer, area: Rect) {
         let uptime = self.start_time.elapsed().as_secs();
-        let title = format!("Dashboard (Uptime: {}s, Frames: {})", uptime, self.frame_count);
+        let title = format!(
+            "Dashboard (Uptime: {}s, Frames: {})",
+            uptime, self.frame_count
+        );
 
         let block = Block::default()
             .title(title)
@@ -178,7 +183,8 @@ impl Dashboard {
         sparkline.render(chunks[2], buffer);
 
         // Info text
-        let info = Paragraph::new("Hot reload enabled!\n\nEdit this file and save to see changes.");
+        let info =
+            Paragraph::new("Hot reload enabled!\n\nEdit this file and save to see changes.");
         let info_block = Block::default()
             .title("Info")
             .borders(Borders::ALL)
@@ -197,7 +203,7 @@ impl Dashboard {
                 let style = if i % 2 == 0 {
                     Style::new().fg(Color::White)
                 } else {
-                    Style::new().fg(Color::Gray)
+                    Style::new().fg(Color::DarkGray)
                 };
                 ListItem::new(log.clone()).style(style)
             })
@@ -217,7 +223,7 @@ impl Dashboard {
             )
             .highlight_symbol(">> ");
 
-        list.render(area, buffer, &mut self.list_state);
+        StatefulWidget::render(&list, area, buffer, &mut self.list_state);
     }
 
     fn render_footer(&self, buffer: &mut Buffer, area: Rect) {
@@ -230,9 +236,14 @@ impl Dashboard {
     }
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
+    // Setup terminal
+    enable_raw_mode()?;
+    stdout().execute(EnterAlternateScreen)?;
+
     // Initialize renderer
-    let renderer = CrosstermRenderer::new(stdout())?;
+    let mut renderer = CrosstermRenderer::new(stdout())?;
+    renderer.show_cursor(false)?;
 
     // Create dashboard engine
     let mut engine = DashboardEngine::new(renderer, PathBuf::from("."));
@@ -272,34 +283,36 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         engine.renderer_mut().draw(&buffer)?;
         engine.renderer_mut().flush()?;
 
-        // Handle events
+        // Handle events with timeout
         let timeout = tick_rate
             .checked_sub(last_tick.elapsed())
             .unwrap_or_else(|| Duration::from_secs(0));
 
-        if let Some(event) = engine.renderer_mut().poll_event(timeout) {
-            match event {
-                Event::Key(key_event) => match key_event.code {
-                    KeyCode::Char('q') => {
-                        dashboard.add_log("Quitting...".to_string());
-                        break;
+        if event::poll(timeout)? {
+            if let CrosstermEvent::Key(key) = event::read()? {
+                if key.kind == KeyEventKind::Press {
+                    match key.code {
+                        CrosstermKeyCode::Char('q') => {
+                            dashboard.add_log("Quitting...".to_string());
+                            break;
+                        }
+                        CrosstermKeyCode::Char('r') => {
+                            dashboard.add_log("Manual reload requested".to_string());
+                            let _ = engine.reload();
+                        }
+                        CrosstermKeyCode::Up => {
+                            dashboard
+                                .list_state
+                                .select_previous(dashboard.log_items.len());
+                        }
+                        CrosstermKeyCode::Down => {
+                            dashboard.list_state.select_next(dashboard.log_items.len());
+                        }
+                        _ => {}
                     }
-                    KeyCode::Char('r') => {
-                        dashboard.add_log("Manual reload requested".to_string());
-                        let _ = engine.reload();
-                    }
-                    KeyCode::Up => {
-                        dashboard.list_state.select_previous(dashboard.log_items.len());
-                    }
-                    KeyCode::Down => {
-                        dashboard.list_state.select_next(dashboard.log_items.len());
-                    }
-                    _ => {}
-                },
-                Event::Resize(_, _) => {
-                    dashboard.add_log("Terminal resized".to_string());
                 }
-                _ => {}
+            } else if let CrosstermEvent::Resize(_, _) = event::read()? {
+                dashboard.add_log("Terminal resized".to_string());
             }
         }
 
@@ -310,8 +323,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    // Cleanup
-    engine.renderer_mut().clear()?;
+    // Cleanup terminal
+    engine.renderer_mut().show_cursor(true)?;
+    stdout().execute(LeaveAlternateScreen)?;
+    disable_raw_mode()?;
+
     println!("Dashboard shut down gracefully");
 
     Ok(())

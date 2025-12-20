@@ -458,7 +458,7 @@ mod tests {
 
         let area = Rect::new(0, 0, 10, 5);
         let mut buffer = Buffer::new(area);
-        list.render(area, &mut buffer, &mut state);
+        StatefulWidget::render(&list, area, &mut buffer, &mut state);
 
         // Check highlight symbol is rendered
         assert_eq!(buffer.get(0, 0).unwrap().symbol, ">");
@@ -479,7 +479,7 @@ mod tests {
 
         let area = Rect::new(0, 0, 10, 5);
         let mut buffer = Buffer::new(area);
-        list.render(area, &mut buffer, &mut state);
+        StatefulWidget::render(&list, area, &mut buffer, &mut state);
 
         // Offset should be adjusted to keep selected item visible
         assert!(state.offset() > 0);
