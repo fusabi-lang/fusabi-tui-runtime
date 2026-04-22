@@ -49,11 +49,9 @@ impl FileLoader {
     /// - Parse dependencies (can be extended for .fsx files)
     /// - Update the cache and dependency graph
     pub fn load(&mut self, path: &Path) -> LoadResult<&LoadedFile> {
-        let canonical_path = path
-            .canonicalize()
-            .map_err(|_| LoadError::FileNotFound {
-                path: path.to_path_buf(),
-            })?;
+        let canonical_path = path.canonicalize().map_err(|_| LoadError::FileNotFound {
+            path: path.to_path_buf(),
+        })?;
 
         // Check if we have a valid cached version
         let needs_reload = if let Some(cached) = self.cache.get(&canonical_path) {
@@ -75,11 +73,9 @@ impl FileLoader {
         }
 
         // Load the file from disk
-        let content = fs::read_to_string(&canonical_path).map_err(|e| {
-            LoadError::ReadFailed {
-                path: canonical_path.clone(),
-                source: e,
-            }
+        let content = fs::read_to_string(&canonical_path).map_err(|e| LoadError::ReadFailed {
+            path: canonical_path.clone(),
+            source: e,
         })?;
 
         let metadata = fs::metadata(&canonical_path).map_err(|e| LoadError::ReadFailed {
@@ -87,12 +83,10 @@ impl FileLoader {
             source: e,
         })?;
 
-        let modified = metadata
-            .modified()
-            .map_err(|e| LoadError::ReadFailed {
-                path: canonical_path.clone(),
-                source: e,
-            })?;
+        let modified = metadata.modified().map_err(|e| LoadError::ReadFailed {
+            path: canonical_path.clone(),
+            source: e,
+        })?;
 
         // Parse dependencies (simplified - can be extended for .fsx imports)
         let dependencies = self.parse_dependencies(&canonical_path, &content)?;

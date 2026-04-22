@@ -36,7 +36,10 @@ impl TuiPlugin for CounterPlugin {
         self.start_time = Some(Instant::now());
         eprintln!("CounterPlugin initialized!");
         eprintln!("Shared memory: {}", ctx.shm_path);
-        eprintln!("Terminal size: {}x{}", ctx.terminal_size.width, ctx.terminal_size.height);
+        eprintln!(
+            "Terminal size: {}x{}",
+            ctx.terminal_size.width, ctx.terminal_size.height
+        );
         Ok(())
     }
 
@@ -44,15 +47,11 @@ impl TuiPlugin for CounterPlugin {
         let mut buffer = Buffer::new(ctx.size);
 
         // Title
-        let title_style = Style::new()
-            .fg(Color::Cyan)
-            .add_modifier(Modifier::BOLD);
+        let title_style = Style::new().fg(Color::Cyan).add_modifier(Modifier::BOLD);
         buffer.set_string(0, 0, "=== Scarab TUI Plugin Demo ===", title_style);
 
         // Counter display
-        let counter_style = Style::new()
-            .fg(Color::Green)
-            .add_modifier(Modifier::BOLD);
+        let counter_style = Style::new().fg(Color::Green).add_modifier(Modifier::BOLD);
         let counter_text = format!("Counter: {}", self.counter);
         buffer.set_string(0, 2, &counter_text, counter_style);
 
@@ -131,7 +130,8 @@ impl TuiPlugin for CounterPlugin {
                     self.last_event = Some(format!("{} (Alt)", self.last_event.as_ref().unwrap()));
                 }
                 if key_event.modifiers.shift {
-                    self.last_event = Some(format!("{} (Shift)", self.last_event.as_ref().unwrap()));
+                    self.last_event =
+                        Some(format!("{} (Shift)", self.last_event.as_ref().unwrap()));
                 }
 
                 Ok(Action::Redraw)

@@ -59,8 +59,8 @@
 #![allow(clippy::module_name_repetitions)]
 
 pub mod barchart;
-pub mod borders;
 pub mod block;
+pub mod borders;
 pub mod clear;
 pub mod gauge;
 pub mod list;

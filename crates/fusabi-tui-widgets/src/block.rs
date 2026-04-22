@@ -5,11 +5,7 @@
 
 use crate::borders::{BorderType, Borders};
 use crate::widget::Widget;
-use fusabi_tui_core::{
-    buffer::Buffer,
-    layout::Rect,
-    style::Style,
-};
+use fusabi_tui_core::{buffer::Buffer, layout::Rect, style::Style};
 
 /// Position of the title within the block.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -317,9 +313,13 @@ impl Block {
 
         // Account for padding
         inner.x = inner.x.saturating_add(self.padding.left);
-        inner.width = inner.width.saturating_sub(self.padding.left + self.padding.right);
+        inner.width = inner
+            .width
+            .saturating_sub(self.padding.left + self.padding.right);
         inner.y = inner.y.saturating_add(self.padding.top);
-        inner.height = inner.height.saturating_sub(self.padding.top + self.padding.bottom);
+        inner.height = inner
+            .height
+            .saturating_sub(self.padding.top + self.padding.bottom);
 
         inner
     }
@@ -334,12 +334,25 @@ impl Block {
             buf.set_string(area.x, area.y, top_left, self.border_style);
         }
         if self.borders.contains(Borders::TOP | Borders::RIGHT) && area.width > 0 {
-            buf.set_string(area.x + area.width - 1, area.y, top_right, self.border_style);
+            buf.set_string(
+                area.x + area.width - 1,
+                area.y,
+                top_right,
+                self.border_style,
+            );
         }
         if self.borders.contains(Borders::BOTTOM | Borders::LEFT) && area.height > 0 {
-            buf.set_string(area.x, area.y + area.height - 1, bottom_left, self.border_style);
+            buf.set_string(
+                area.x,
+                area.y + area.height - 1,
+                bottom_left,
+                self.border_style,
+            );
         }
-        if self.borders.contains(Borders::BOTTOM | Borders::RIGHT) && area.width > 0 && area.height > 0 {
+        if self.borders.contains(Borders::BOTTOM | Borders::RIGHT)
+            && area.width > 0
+            && area.height > 0
+        {
             buf.set_string(
                 area.x + area.width - 1,
                 area.y + area.height - 1,
@@ -395,9 +408,7 @@ impl Block {
                 TitleAlignment::Center => {
                     area.x + 1 + (available_width.saturating_sub(title_width)) / 2
                 }
-                TitleAlignment::Right => {
-                    area.x + 1 + available_width.saturating_sub(title_width)
-                }
+                TitleAlignment::Right => area.x + 1 + available_width.saturating_sub(title_width),
             };
 
             // Render the title with padding spaces
@@ -594,9 +605,7 @@ mod tests {
 
     #[test]
     fn test_block_render_with_title() {
-        let block = Block::default()
-            .title("Test")
-            .borders(Borders::ALL);
+        let block = Block::default().title("Test").borders(Borders::ALL);
         let area = Rect::new(0, 0, 10, 5);
         let mut buffer = Buffer::new(area);
 

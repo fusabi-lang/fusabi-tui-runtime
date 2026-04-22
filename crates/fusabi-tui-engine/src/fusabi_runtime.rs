@@ -84,7 +84,7 @@ impl FusabiContext {
     /// Create a new Fusabi context for the given entry file.
     ///
     /// This initializes the Fusabi engine and registers all TUI host functions.
-    /// The script is not evaluated until [`evaluate`] is called.
+    /// The script is not evaluated until [`FusabiContext::evaluate`] is called.
     pub fn new(entry_file: PathBuf) -> Self {
         let mut ctx = Self {
             entry_file,
@@ -194,12 +194,26 @@ impl FusabiContext {
             .push("tui.color.indexed".to_string());
 
         // tui.color.reset() -> Color
-        self.registered_functions.push("tui.color.reset".to_string());
+        self.registered_functions
+            .push("tui.color.reset".to_string());
 
         // Named colors
         for name in &[
-            "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white", "darkGray",
-            "lightRed", "lightGreen", "lightYellow", "lightBlue", "lightMagenta", "lightCyan",
+            "black",
+            "red",
+            "green",
+            "yellow",
+            "blue",
+            "magenta",
+            "cyan",
+            "white",
+            "darkGray",
+            "lightRed",
+            "lightGreen",
+            "lightYellow",
+            "lightBlue",
+            "lightMagenta",
+            "lightCyan",
         ] {
             self.registered_functions
                 .push(format!("tui.color.{}", name));
@@ -311,8 +325,7 @@ impl FusabiContext {
             .push("tui.buffer.setStyle".to_string());
 
         // tui.buffer.get(x, y, buffer) -> Cell
-        self.registered_functions
-            .push("tui.buffer.get".to_string());
+        self.registered_functions.push("tui.buffer.get".to_string());
 
         // tui.buffer.clear(buffer) -> ()
         self.registered_functions
@@ -413,7 +426,10 @@ let x = 42
     #[test]
     fn test_extract_quoted_string() {
         assert_eq!(extract_quoted_string(r#""hello""#), Some("hello"));
-        assert_eq!(extract_quoted_string(r#"  "path/to/file"  "#), Some("path/to/file"));
+        assert_eq!(
+            extract_quoted_string(r#"  "path/to/file"  "#),
+            Some("path/to/file")
+        );
         assert_eq!(extract_quoted_string(r#"unquoted"#), None);
         assert_eq!(extract_quoted_string(r#""unclosed"#), None);
     }

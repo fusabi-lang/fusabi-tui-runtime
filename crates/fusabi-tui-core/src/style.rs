@@ -414,13 +414,9 @@ mod tests {
 
     #[test]
     fn test_style_patch() {
-        let style1 = Style::new()
-            .fg(Color::Red)
-            .add_modifier(Modifier::BOLD);
+        let style1 = Style::new().fg(Color::Red).add_modifier(Modifier::BOLD);
 
-        let style2 = Style::new()
-            .bg(Color::Black)
-            .add_modifier(Modifier::ITALIC);
+        let style2 = Style::new().bg(Color::Black).add_modifier(Modifier::ITALIC);
 
         let patched = style1.patch(style2);
         assert_eq!(patched.fg, Some(Color::Red));

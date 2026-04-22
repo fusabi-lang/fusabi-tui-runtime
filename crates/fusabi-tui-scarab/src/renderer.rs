@@ -231,10 +231,7 @@ mod tests {
         let mut shared_cells = Vec::new();
         for y in 0..5 {
             for x in 0..10 {
-                let cell = buffer
-                    .get(x, y)
-                    .map(SharedCell::from)
-                    .unwrap_or_default();
+                let cell = buffer.get(x, y).map(SharedCell::from).unwrap_or_default();
                 shared_cells.push(cell);
             }
         }

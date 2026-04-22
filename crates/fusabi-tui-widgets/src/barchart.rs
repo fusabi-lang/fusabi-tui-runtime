@@ -3,12 +3,7 @@
 //! This module provides a `BarChart` widget that visualizes data using vertical bars
 //! with customizable styles and grouping.
 
-use fusabi_tui_core::{
-    buffer::Buffer,
-    layout::Rect,
-    style::Style,
-    symbols::bar,
-};
+use fusabi_tui_core::{buffer::Buffer, layout::Rect, style::Style, symbols::bar};
 use unicode_width::UnicodeWidthStr;
 
 use crate::widget::Widget;
@@ -305,14 +300,7 @@ impl BarChart {
     }
 
     /// Renders a single vertical bar.
-    fn render_vertical_bar(
-        &self,
-        bar: &Bar,
-        x: u16,
-        area: Rect,
-        buf: &mut Buffer,
-        max_value: u64,
-    ) {
+    fn render_vertical_bar(&self, bar: &Bar, x: u16, area: Rect, buf: &mut Buffer, max_value: u64) {
         // Calculate available height (leave space for labels)
         let label_height = if bar.label.is_some() { 1 } else { 0 };
         let value_text_height = if bar.text_value.is_some() { 1 } else { 0 };

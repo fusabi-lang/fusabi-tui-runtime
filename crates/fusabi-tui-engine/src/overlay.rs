@@ -157,8 +157,11 @@ impl ErrorOverlay {
 
         // Create title string
         let title_str = format!(" {}: {} ", error.severity.as_str(), error.title);
-        let title = Title::new(title_str)
-            .style(Style::default().fg(title_color).add_modifier(Modifier::BOLD));
+        let title = Title::new(title_str).style(
+            Style::default()
+                .fg(title_color)
+                .add_modifier(Modifier::BOLD),
+        );
 
         // Create the block with borders
         let block = Block::default()
@@ -201,8 +204,7 @@ impl ErrorOverlay {
         // Footer
         content.push_str("Press Ctrl+D to dismiss, Ctrl+R to reload");
 
-        let para = Paragraph::new(content)
-            .style(Style::default().fg(Color::White));
+        let para = Paragraph::new(content).style(Style::default().fg(Color::White));
         para.render(inner, buf);
     }
 
@@ -256,13 +258,12 @@ impl ErrorMessage {
                 .with_hint("Check file permissions")
                 .with_hint("Ensure the file is not locked by another process"),
 
-                LoadError::ParseFailed { path, reason } => Self::new(
-                    "Parse Error",
-                    format!("Failed to parse file: {}", reason),
-                )
-                .with_source(path.display().to_string())
-                .with_hint("Check the syntax of your .fsx file")
-                .with_hint("Look for unclosed brackets, quotes, or other syntax errors"),
+                LoadError::ParseFailed { path, reason } => {
+                    Self::new("Parse Error", format!("Failed to parse file: {}", reason))
+                        .with_source(path.display().to_string())
+                        .with_hint("Check the syntax of your .fsx file")
+                        .with_hint("Look for unclosed brackets, quotes, or other syntax errors")
+                }
 
                 _ => Self::new("Load Error", format!("{}", load_err)),
             },
@@ -273,12 +274,10 @@ impl ErrorMessage {
                     .with_severity(ErrorSeverity::Warning)
             }
 
-            EngineError::Render(render_err) => {
-                Self::new("Render Error", format!("{}", render_err))
-                    .with_hint("This may be a temporary issue")
-                    .with_hint("Try resizing the terminal or reloading")
-                    .with_severity(ErrorSeverity::Warning)
-            }
+            EngineError::Render(render_err) => Self::new("Render Error", format!("{}", render_err))
+                .with_hint("This may be a temporary issue")
+                .with_hint("Try resizing the terminal or reloading")
+                .with_severity(ErrorSeverity::Warning),
 
             EngineError::InvalidState(msg) => {
                 Self::new("Invalid State", msg.clone()).with_hint("Try reloading the dashboard")

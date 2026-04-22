@@ -9,7 +9,12 @@ pub enum ScarabError {
 
     /// Shared memory size mismatch
     #[error("Shared memory size mismatch: expected {expected}, got {actual}")]
-    SizeMismatch { expected: usize, actual: usize },
+    SizeMismatch {
+        /// Expected shared-memory size in bytes.
+        expected: usize,
+        /// Actual shared-memory size in bytes.
+        actual: usize,
+    },
 
     /// Invalid shared memory layout
     #[error("Invalid shared memory layout: {0}")]

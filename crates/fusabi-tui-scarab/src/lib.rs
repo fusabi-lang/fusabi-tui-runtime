@@ -110,8 +110,8 @@ pub use shared::{SharedCell, SharedState, GRID_HEIGHT, GRID_WIDTH, SHMEM_PATH};
 
 #[cfg(feature = "plugin")]
 pub use plugin::{
-    Action, InputEvent, KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent,
-    MouseEventKind, PluginContext, RenderContext, TuiPlugin,
+    Action, InputEvent, KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind,
+    PluginContext, RenderContext, TuiPlugin,
 };
 
 /// Prelude module for convenient imports.

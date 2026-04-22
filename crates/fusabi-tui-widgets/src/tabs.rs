@@ -3,11 +3,7 @@
 //! This module provides a `Tabs` widget that displays a list of tab titles with
 //! highlighting for the selected tab and customizable dividers.
 
-use fusabi_tui_core::{
-    buffer::Buffer,
-    layout::Rect,
-    style::Style,
-};
+use fusabi_tui_core::{buffer::Buffer, layout::Rect, style::Style};
 
 use crate::block::Block;
 use crate::widget::Widget;
@@ -325,8 +321,7 @@ mod tests {
 
     #[test]
     fn test_tabs_render_with_spaces_divider() {
-        let tabs = Tabs::new(vec!["A", "B", "C"])
-            .divider(" | ");
+        let tabs = Tabs::new(vec!["A", "B", "C"]).divider(" | ");
 
         let area = Rect::new(0, 0, 20, 1);
         let mut buffer = Buffer::new(area);
@@ -342,8 +337,7 @@ mod tests {
 
     #[test]
     fn test_tabs_render_truncated() {
-        let tabs = Tabs::new(vec!["VeryLongTabName1", "VeryLongTabName2"])
-            .divider("|");
+        let tabs = Tabs::new(vec!["VeryLongTabName1", "VeryLongTabName2"]).divider("|");
 
         let area = Rect::new(0, 0, 10, 1); // Only 10 cells wide
         let mut buffer = Buffer::new(area);
@@ -373,8 +367,7 @@ mod tests {
 
     #[test]
     fn test_tabs_render_unicode_divider() {
-        let tabs = Tabs::new(vec!["Tab1", "Tab2"])
-            .divider(" │ ");
+        let tabs = Tabs::new(vec!["Tab1", "Tab2"]).divider(" │ ");
 
         let area = Rect::new(0, 0, 20, 1);
         let mut buffer = Buffer::new(area);

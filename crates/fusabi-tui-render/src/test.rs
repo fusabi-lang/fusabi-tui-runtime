@@ -62,11 +62,7 @@ impl TestRenderer {
     pub fn assert_buffer(&self, expected: &Buffer) {
         if self.buffer != *expected {
             let diff = self.buffer.diff(expected);
-            panic!(
-                "Buffer mismatch! {} cells differ:\n{:#?}",
-                diff.len(),
-                diff
-            );
+            panic!("Buffer mismatch! {} cells differ:\n{:#?}", diff.len(), diff);
         }
     }
 

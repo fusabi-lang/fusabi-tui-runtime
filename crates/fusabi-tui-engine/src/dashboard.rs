@@ -283,11 +283,17 @@ impl<R: Renderer> DashboardEngine<R> {
     fn render_placeholder(&self, buffer: &mut Buffer, area: Rect) {
         use fusabi_tui_widgets::block::Title;
 
-        let entry_file = self.entry_file.as_ref().map(|p| p.display().to_string())
+        let entry_file = self
+            .entry_file
+            .as_ref()
+            .map(|p| p.display().to_string())
             .unwrap_or_else(|| "unknown".to_string());
 
-        let title = Title::new(" Fusabi Dashboard ")
-            .style(Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD));
+        let title = Title::new(" Fusabi Dashboard ").style(
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        );
 
         let block = Block::default()
             .title(title)
@@ -306,12 +312,15 @@ impl<R: Renderer> DashboardEngine<R> {
              Waiting for Fusabi render callback...\n\n\
              Press Ctrl+R to reload, Ctrl+C to quit",
             entry_file,
-            if self.watcher.is_some() { "enabled" } else { "disabled" },
+            if self.watcher.is_some() {
+                "enabled"
+            } else {
+                "disabled"
+            },
             self.state.widgets.len()
         );
 
-        let para = Paragraph::new(info_text)
-            .style(Style::default().fg(Color::White));
+        let para = Paragraph::new(info_text).style(Style::default().fg(Color::White));
         para.render(inner, buffer);
     }
 
@@ -319,8 +328,11 @@ impl<R: Renderer> DashboardEngine<R> {
     fn render_empty_state(&self, buffer: &mut Buffer, area: Rect) {
         use fusabi_tui_widgets::block::Title;
 
-        let title = Title::new(" Fusabi Dashboard Engine ")
-            .style(Style::default().fg(Color::Blue).add_modifier(Modifier::BOLD));
+        let title = Title::new(" Fusabi Dashboard Engine ").style(
+            Style::default()
+                .fg(Color::Blue)
+                .add_modifier(Modifier::BOLD),
+        );
 
         let block = Block::default()
             .title(title)
@@ -341,8 +353,7 @@ impl<R: Renderer> DashboardEngine<R> {
               - Error overlay for debugging\n\n\
             Press Ctrl+C to quit";
 
-        let para = Paragraph::new(info_text)
-            .style(Style::default().fg(Color::DarkGray));
+        let para = Paragraph::new(info_text).style(Style::default().fg(Color::DarkGray));
         para.render(inner, buffer);
     }
 
