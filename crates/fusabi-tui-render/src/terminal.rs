@@ -60,9 +60,7 @@ impl<R: Renderer> Terminal<R> {
         self.renderer.draw(&buffer)?;
         self.renderer.flush()?;
 
-        Ok(CompletedFrame {
-            area: size,
-        })
+        Ok(CompletedFrame { area: size })
     }
 
     /// Gets the current terminal size.

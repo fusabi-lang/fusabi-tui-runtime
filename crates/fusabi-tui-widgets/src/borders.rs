@@ -70,7 +70,16 @@ impl BorderType {
     /// Returns the Unicode characters for this border type.
     ///
     /// Returns a tuple of (horizontal, vertical, top_left, top_right, bottom_left, bottom_right).
-    pub(crate) fn line_symbols(self) -> (&'static str, &'static str, &'static str, &'static str, &'static str, &'static str) {
+    pub(crate) fn line_symbols(
+        self,
+    ) -> (
+        &'static str,
+        &'static str,
+        &'static str,
+        &'static str,
+        &'static str,
+        &'static str,
+    ) {
         use fusabi_tui_core::symbols::line;
 
         match self {

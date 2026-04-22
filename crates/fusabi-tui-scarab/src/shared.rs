@@ -8,9 +8,11 @@ use std::sync::atomic::{AtomicU64, Ordering};
 /// Default shared memory path (matches Scarab protocol)
 pub const SHMEM_PATH: &str = "/scarab_shm_v1";
 
-/// Grid dimensions (matches Scarab protocol)
+/// Grid width in cells (matches Scarab protocol).
 pub const GRID_WIDTH: usize = 200;
+/// Grid height in cells (matches Scarab protocol).
 pub const GRID_HEIGHT: usize = 100;
+/// Total number of cells in the shared buffer (`GRID_WIDTH * GRID_HEIGHT`).
 pub const BUFFER_SIZE: usize = GRID_WIDTH * GRID_HEIGHT;
 
 /// A single cell in the shared memory grid.
@@ -45,13 +47,21 @@ impl Default for SharedCell {
 
 /// Cell attribute flags
 impl SharedCell {
+    /// Bold text attribute.
     pub const FLAG_BOLD: u8 = 0b0000_0001;
+    /// Dim (faint) text attribute.
     pub const FLAG_DIM: u8 = 0b0000_0010;
+    /// Italic text attribute.
     pub const FLAG_ITALIC: u8 = 0b0000_0100;
+    /// Underline text attribute.
     pub const FLAG_UNDERLINE: u8 = 0b0000_1000;
+    /// Blinking text attribute.
     pub const FLAG_BLINK: u8 = 0b0001_0000;
+    /// Reverse-video text attribute.
     pub const FLAG_REVERSE: u8 = 0b0010_0000;
+    /// Hidden text attribute.
     pub const FLAG_HIDDEN: u8 = 0b0100_0000;
+    /// Strikethrough text attribute.
     pub const FLAG_STRIKETHROUGH: u8 = 0b1000_0000;
 }
 
@@ -206,7 +216,9 @@ mod tests {
 
         // Valid coordinates
         assert!(state.get_cell(0, 0).is_some());
-        assert!(state.get_cell(GRID_WIDTH as u16 - 1, GRID_HEIGHT as u16 - 1).is_some());
+        assert!(state
+            .get_cell(GRID_WIDTH as u16 - 1, GRID_HEIGHT as u16 - 1)
+            .is_some());
 
         // Invalid coordinates
         assert!(state.get_cell(GRID_WIDTH as u16, 0).is_none());

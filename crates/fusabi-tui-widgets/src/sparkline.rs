@@ -3,12 +3,7 @@
 //! This module provides a `Sparkline` widget that displays a small inline chart
 //! using vertical bar characters to visualize data trends.
 
-use fusabi_tui_core::{
-    buffer::Buffer,
-    layout::Rect,
-    style::Style,
-    symbols::bar,
-};
+use fusabi_tui_core::{buffer::Buffer, layout::Rect, style::Style, symbols::bar};
 
 use crate::block::Block;
 use crate::widget::Widget;

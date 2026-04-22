@@ -236,7 +236,9 @@ impl Table {
         }
 
         // Account for column spacing
-        let spacing_width = self.column_spacing.saturating_mul(self.widths.len().saturating_sub(1) as u16);
+        let spacing_width = self
+            .column_spacing
+            .saturating_mul(self.widths.len().saturating_sub(1) as u16);
         let available = max_width.saturating_sub(spacing_width);
 
         // Calculate widths based on constraints
@@ -302,14 +304,7 @@ impl Table {
     }
 
     /// Renders a single row at the given position.
-    fn render_row(
-        &self,
-        buf: &mut Buffer,
-        area: Rect,
-        row: &Row,
-        widths: &[u16],
-        style: Style,
-    ) {
+    fn render_row(&self, buf: &mut Buffer, area: Rect, row: &Row, widths: &[u16], style: Style) {
         let mut x = area.x;
         let y = area.y;
 
@@ -496,18 +491,14 @@ mod tests {
 
     #[test]
     fn test_table_new() {
-        let table = Table::new(vec![
-            Row::new(vec!["a", "b"]),
-            Row::new(vec!["c", "d"]),
-        ]);
+        let table = Table::new(vec![Row::new(vec!["a", "b"]), Row::new(vec!["c", "d"])]);
         assert_eq!(table.rows.len(), 2);
         assert_eq!(table.header, None);
     }
 
     #[test]
     fn test_table_with_header() {
-        let table = Table::new(vec![Row::new(vec!["a", "b"])])
-            .header(Row::new(vec!["H1", "H2"]));
+        let table = Table::new(vec![Row::new(vec!["a", "b"])]).header(Row::new(vec!["H1", "H2"]));
         assert!(table.header.is_some());
     }
 
@@ -543,11 +534,8 @@ mod tests {
 
     #[test]
     fn test_table_render() {
-        let table = Table::new(vec![
-            Row::new(vec!["a", "b"]),
-            Row::new(vec!["c", "d"]),
-        ])
-        .widths(&[Constraint::Length(5), Constraint::Length(5)]);
+        let table = Table::new(vec![Row::new(vec!["a", "b"]), Row::new(vec!["c", "d"])])
+            .widths(&[Constraint::Length(5), Constraint::Length(5)]);
 
         let area = Rect::new(0, 0, 20, 10);
         let mut buffer = Buffer::new(area);
@@ -563,12 +551,9 @@ mod tests {
     #[test]
     fn test_table_render_with_selection() {
         let highlight_style = Style::default().fg(Color::Green);
-        let table = Table::new(vec![
-            Row::new(vec!["a", "b"]),
-            Row::new(vec!["c", "d"]),
-        ])
-        .widths(&[Constraint::Length(5), Constraint::Length(5)])
-        .highlight_style(highlight_style);
+        let table = Table::new(vec![Row::new(vec!["a", "b"]), Row::new(vec!["c", "d"])])
+            .widths(&[Constraint::Length(5), Constraint::Length(5)])
+            .highlight_style(highlight_style);
 
         let area = Rect::new(0, 0, 20, 10);
         let mut buffer = Buffer::new(area);

@@ -120,14 +120,14 @@ impl ColorPalette {
     /// Features a dark background with green/cyan accents.
     pub fn slime() -> Self {
         Self {
-            background: Color::Rgb(30, 35, 36),        // #1e2324
-            foreground: Color::Rgb(224, 224, 224),     // #e0e0e0
-            primary: Color::Rgb(168, 223, 90),         // #a8df5a (slime green)
-            secondary: Color::Rgb(128, 181, 179),      // #80B5B3 (cyan)
-            accent: Color::Rgb(174, 193, 153),         // #AEC199 (green)
-            error: Color::Rgb(205, 101, 100),          // #cd6564 (red)
-            warning: Color::Rgb(255, 240, 153),        // #fff099 (yellow)
-            success: Color::Rgb(174, 193, 153),        // #AEC199 (green)
+            background: Color::Rgb(30, 35, 36),    // #1e2324
+            foreground: Color::Rgb(224, 224, 224), // #e0e0e0
+            primary: Color::Rgb(168, 223, 90),     // #a8df5a (slime green)
+            secondary: Color::Rgb(128, 181, 179),  // #80B5B3 (cyan)
+            accent: Color::Rgb(174, 193, 153),     // #AEC199 (green)
+            error: Color::Rgb(205, 101, 100),      // #cd6564 (red)
+            warning: Color::Rgb(255, 240, 153),    // #fff099 (yellow)
+            success: Color::Rgb(174, 193, 153),    // #AEC199 (green)
         }
     }
 }
@@ -150,7 +150,10 @@ pub struct Theme {
     /// Color palette
     pub colors: ColorPalette,
     /// Named style mappings
-    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "StyleMap::is_empty"))]
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "StyleMap::is_empty")
+    )]
     pub styles: StyleMap,
 }
 
@@ -281,8 +284,8 @@ impl Theme {
     /// ```
     #[cfg(feature = "serde")]
     pub fn from_toml(toml_str: &str) -> Result<Self, String> {
-        let mut theme: Self = toml::from_str(toml_str)
-            .map_err(|e| format!("Failed to parse TOML: {}", e))?;
+        let mut theme: Self =
+            toml::from_str(toml_str).map_err(|e| format!("Failed to parse TOML: {}", e))?;
 
         // Generate default styles if none were provided
         if theme.styles.is_empty() {
@@ -322,8 +325,7 @@ impl Theme {
     #[cfg(feature = "serde")]
     pub fn to_toml_file(&self, path: impl AsRef<std::path::Path>) -> Result<(), String> {
         let content = self.to_toml()?;
-        std::fs::write(path, content)
-            .map_err(|e| format!("Failed to write theme file: {}", e))
+        std::fs::write(path, content).map_err(|e| format!("Failed to write theme file: {}", e))
     }
 
     /// Generates default styles based on the color palette.
@@ -344,14 +346,8 @@ impl Theme {
             "selected".to_string(),
             Style::new().fg(colors.background).bg(colors.primary),
         );
-        styles.insert(
-            "highlight".to_string(),
-            Style::new().fg(colors.accent),
-        );
-        styles.insert(
-            "focus".to_string(),
-            Style::new().fg(colors.primary),
-        );
+        styles.insert("highlight".to_string(), Style::new().fg(colors.accent));
+        styles.insert("focus".to_string(), Style::new().fg(colors.primary));
 
         // Status styles
         styles.insert("error".to_string(), Style::new().fg(colors.error));
@@ -367,10 +363,7 @@ impl Theme {
             "gauge_label".to_string(),
             Style::new().fg(colors.foreground),
         );
-        styles.insert(
-            "table_header".to_string(),
-            Style::new().fg(colors.primary),
-        );
+        styles.insert("table_header".to_string(), Style::new().fg(colors.primary));
         styles.insert(
             "table_selected".to_string(),
             Style::new().fg(colors.background).bg(colors.primary),

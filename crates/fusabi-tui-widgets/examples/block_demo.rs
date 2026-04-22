@@ -32,7 +32,11 @@ fn main() {
             Title::new("Bottom Title")
                 .position(TitlePosition::Bottom)
                 .alignment(TitleAlignment::Right)
-                .style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD)),
+                .style(
+                    Style::default()
+                        .fg(Color::Yellow)
+                        .add_modifier(Modifier::BOLD),
+                ),
         )
         .borders(Borders::ALL)
         .border_type(BorderType::Double)
@@ -60,8 +64,10 @@ fn main() {
 
     // Demonstrate inner area calculation
     let inner = block3.inner(area);
-    println!("\nInner area for block3: x={}, y={}, w={}, h={}",
-             inner.x, inner.y, inner.width, inner.height);
+    println!(
+        "\nInner area for block3: x={}, y={}, w={}, h={}",
+        inner.x, inner.y, inner.width, inner.height
+    );
 }
 
 fn print_buffer(buffer: &Buffer) {
