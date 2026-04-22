@@ -15,8 +15,21 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  check-aarch64:
+    name: Check on aarch64 Linux
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build workspace
+        run: cargo build --workspace --lib
+      - name: Test workspace
+        run: cargo test --workspace --lib
+
   publish:
     name: Publish to crates.io
+    needs: check-aarch64
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
