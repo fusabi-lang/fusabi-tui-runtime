@@ -346,19 +346,14 @@ mod tests {
 
     #[test]
     fn test_text_from_lines() {
-        let text = Text::from(vec![
-            Line::from("line1"),
-            Line::from("line2"),
-        ]);
+        let text = Text::from(vec![Line::from("line1"), Line::from("line2")]);
         assert_eq!(text.lines.len(), 2);
     }
 
     #[test]
     fn test_text_style() {
         let style = Style::default().fg(Color::Blue);
-        let text = Text::from(vec![
-            Line::from(Span::raw("test")),
-        ]).style(style);
+        let text = Text::from(vec![Line::from(Span::raw("test"))]).style(style);
         assert_eq!(text.lines[0].spans[0].style.fg, Some(Color::Blue));
     }
 }

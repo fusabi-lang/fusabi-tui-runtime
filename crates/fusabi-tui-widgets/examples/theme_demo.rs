@@ -6,8 +6,8 @@
 use fusabi_tui_core::{
     buffer::Buffer,
     layout::Rect,
-    theme::{ColorPalette, Theme},
     style::Color,
+    theme::{ColorPalette, Theme},
 };
 use fusabi_tui_widgets::{
     block::Block,

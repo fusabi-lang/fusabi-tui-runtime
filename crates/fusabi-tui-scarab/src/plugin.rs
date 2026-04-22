@@ -67,7 +67,12 @@ pub enum InputEvent {
     /// Mouse event
     Mouse(MouseEvent),
     /// Terminal resize
-    Resize { width: u16, height: u16 },
+    Resize {
+        /// New terminal width in cells.
+        width: u16,
+        /// New terminal height in cells.
+        height: u16,
+    },
     /// Focus gained
     FocusGained,
     /// Focus lost
@@ -132,6 +137,7 @@ pub struct KeyModifiers {
 }
 
 impl KeyModifiers {
+    /// `KeyModifiers` value with no modifiers held.
     pub const NONE: Self = Self {
         ctrl: false,
         alt: false,
@@ -276,9 +282,7 @@ mod tests {
 
     impl TestPlugin {
         fn new() -> Self {
-            Self {
-                initialized: false,
-            }
+            Self { initialized: false }
         }
     }
 

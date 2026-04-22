@@ -7,11 +7,11 @@
 //! - Handling keyboard events
 //! - Clean shutdown
 
+use crossterm::ExecutableCommand;
 use crossterm::{
     event::{self, Event as CrosstermEvent, KeyCode as CrosstermKeyCode, KeyEventKind},
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use crossterm::ExecutableCommand;
 use fusabi_tui_core::{
     buffer::Buffer,
     layout::{Constraint, Direction, Layout, Rect},

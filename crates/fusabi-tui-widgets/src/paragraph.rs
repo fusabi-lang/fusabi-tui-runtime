@@ -1,10 +1,6 @@
 //! Paragraph widget for displaying multi-line text with wrapping and alignment.
 
-use fusabi_tui_core::{
-    buffer::Buffer,
-    layout::Rect,
-    style::Style,
-};
+use fusabi_tui_core::{buffer::Buffer, layout::Rect, style::Style};
 use unicode_width::UnicodeWidthStr;
 
 use crate::{
@@ -218,10 +214,8 @@ impl<'a> Paragraph<'a> {
 
                 if word_width > width {
                     // Word is too long, wrap at character boundary
-                    let char_wrapped = self.wrap_line_char(
-                        &Line::from(Span::styled(word, span.style)),
-                        width,
-                    );
+                    let char_wrapped =
+                        self.wrap_line_char(&Line::from(Span::styled(word, span.style)), width);
                     for (i, char_line) in char_wrapped.into_iter().enumerate() {
                         if i > 0 && !current_line.is_empty() {
                             wrapped.push(Line::from_spans(current_line));
@@ -298,10 +292,10 @@ impl Widget for Paragraph<'_> {
 
             // Apply horizontal scroll to spans
             let mut skip_width = self.scroll_x as usize;
-            
+
             for span in &line.spans {
                 let span_width = span.width();
-                
+
                 if skip_width >= span_width {
                     skip_width -= span_width;
                     continue;
@@ -353,7 +347,7 @@ mod tests {
     #[test]
     fn test_paragraph_with_block() {
         use crate::{Block, Borders};
-        
+
         let block = Block::default().borders(Borders::ALL);
         let p = Paragraph::new("test").block(block);
         assert!(p.block.is_some());
@@ -361,22 +355,19 @@ mod tests {
 
     #[test]
     fn test_paragraph_alignment() {
-        let p = Paragraph::new("test")
-            .alignment(Alignment::Center);
+        let p = Paragraph::new("test").alignment(Alignment::Center);
         assert_eq!(p.alignment, Alignment::Center);
     }
 
     #[test]
     fn test_paragraph_wrap() {
-        let p = Paragraph::new("test")
-            .wrap(Wrap::WordWrap);
+        let p = Paragraph::new("test").wrap(Wrap::WordWrap);
         assert_eq!(p.wrap, Wrap::WordWrap);
     }
 
     #[test]
     fn test_paragraph_render() {
-        let p = Paragraph::new("Hello\nWorld")
-            .style(Style::default().fg(Color::Green));
+        let p = Paragraph::new("Hello\nWorld").style(Style::default().fg(Color::Green));
 
         let area = Rect::new(0, 0, 10, 5);
         let mut buffer = Buffer::new(area);
@@ -391,7 +382,7 @@ mod tests {
         let p = Paragraph::new("").wrap(Wrap::Wrap);
         let line = Line::from("Hello World");
         let wrapped = p.wrap_line(&line, 5);
-        
+
         assert!(wrapped.len() >= 2);
     }
 
@@ -400,7 +391,7 @@ mod tests {
         let p = Paragraph::new("").wrap(Wrap::WordWrap);
         let line = Line::from("Hello World");
         let wrapped = p.wrap_line(&line, 7);
-        
+
         assert!(wrapped.len() >= 2);
     }
 
@@ -409,7 +400,7 @@ mod tests {
         let p = Paragraph::new("").alignment(Alignment::Center);
         let line = Line::from("Hi");
         let (offset, _) = p.align_line(&line, 10);
-        
+
         assert_eq!(offset, 4); // (10 - 2) / 2 = 4
     }
 
@@ -418,14 +409,13 @@ mod tests {
         let p = Paragraph::new("").alignment(Alignment::Right);
         let line = Line::from("Hi");
         let (offset, _) = p.align_line(&line, 10);
-        
+
         assert_eq!(offset, 8); // 10 - 2 = 8
     }
 
     #[test]
     fn test_paragraph_scroll() {
-        let p = Paragraph::new("Line1\nLine2\nLine3\nLine4")
-            .scroll(0, 1);
+        let p = Paragraph::new("Line1\nLine2\nLine3\nLine4").scroll(0, 1);
 
         let area = Rect::new(0, 0, 10, 2);
         let mut buffer = Buffer::new(area);

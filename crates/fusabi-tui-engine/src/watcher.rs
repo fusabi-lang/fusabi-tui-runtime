@@ -61,12 +61,10 @@ impl FileWatcher {
     ///
     /// For directories, this will watch all files in the directory recursively.
     pub fn watch(&mut self, path: &Path) -> WatchResult<()> {
-        let canonical_path = path
-            .canonicalize()
-            .map_err(|e| WatchError::WatchFailed {
-                path: path.to_path_buf(),
-                reason: e.to_string(),
-            })?;
+        let canonical_path = path.canonicalize().map_err(|e| WatchError::WatchFailed {
+            path: path.to_path_buf(),
+            reason: e.to_string(),
+        })?;
 
         // Don't watch if already watching
         if self.watched_paths.contains(&canonical_path) {
@@ -87,12 +85,10 @@ impl FileWatcher {
 
     /// Stop watching a file or directory.
     pub fn unwatch(&mut self, path: &Path) -> WatchResult<()> {
-        let canonical_path = path
-            .canonicalize()
-            .map_err(|e| WatchError::UnwatchFailed {
-                path: path.to_path_buf(),
-                reason: e.to_string(),
-            })?;
+        let canonical_path = path.canonicalize().map_err(|e| WatchError::UnwatchFailed {
+            path: path.to_path_buf(),
+            reason: e.to_string(),
+        })?;
 
         if !self.watched_paths.contains(&canonical_path) {
             return Ok(());
@@ -139,8 +135,7 @@ impl FileWatcher {
         let now = std::time::Instant::now();
         let elapsed = now.duration_since(self.last_process_time);
 
-        if elapsed >= Duration::from_millis(self.debounce_ms) && !self.pending_changes.is_empty()
-        {
+        if elapsed >= Duration::from_millis(self.debounce_ms) && !self.pending_changes.is_empty() {
             let changes: Vec<PathBuf> = self.pending_changes.drain().collect();
             self.last_process_time = now;
             changes
