@@ -95,7 +95,7 @@ impl FileLoader {
         for dep in &dependencies {
             self.dependents
                 .entry(dep.clone())
-                .or_insert_with(HashSet::new)
+                .or_default()
                 .insert(canonical_path.clone());
         }
 

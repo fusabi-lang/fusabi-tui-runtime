@@ -48,9 +48,10 @@ impl Default for Borders {
 ///
 /// Different border types use different Unicode characters for drawing the border lines
 /// and corners.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum BorderType {
     /// Plain borders using simple box-drawing characters (┌─┐│└─┘)
+    #[default]
     Plain,
     /// Rounded borders using rounded corners (╭─╮│╰─╯)
     Rounded,
@@ -58,12 +59,6 @@ pub enum BorderType {
     Double,
     /// Thick borders using heavy box-drawing characters (┏━┓┃┗━┛)
     Thick,
-}
-
-impl Default for BorderType {
-    fn default() -> Self {
-        Self::Plain
-    }
 }
 
 impl BorderType {

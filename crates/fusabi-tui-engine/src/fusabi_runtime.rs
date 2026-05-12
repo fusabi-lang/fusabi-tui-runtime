@@ -38,11 +38,9 @@
 
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::Arc;
 
 use fusabi_tui_core::buffer::Buffer;
 use fusabi_tui_core::layout::Rect;
-use fusabi_tui_core::style::{Color, Modifier, Style};
 
 use crate::error::{EngineError, EngineResult};
 use crate::state::DashboardState;
@@ -55,6 +53,7 @@ use crate::state::DashboardState;
 #[derive(Debug)]
 pub struct FusabiContext {
     /// Path to the entry script file.
+    #[allow(dead_code)]
     entry_file: PathBuf,
 
     /// Compiled module cache for hot reload optimization.
@@ -115,7 +114,7 @@ impl FusabiContext {
     /// - The script contains syntax errors
     /// - A required dependency is missing
     /// - Runtime evaluation fails
-    pub fn evaluate(&mut self, source: &str) -> EngineResult<()> {
+    pub fn evaluate(&mut self, _source: &str) -> EngineResult<()> {
         // TODO: Integrate with Fusabi v0.34+ engine
         // 1. Create Engine instance
         // 2. Register host functions via call_host API
@@ -142,9 +141,9 @@ impl FusabiContext {
     /// Returns an error if the render function fails or is not defined.
     pub fn render(
         &mut self,
-        buffer: &mut Buffer,
-        area: Rect,
-        state: &DashboardState,
+        _buffer: &mut Buffer,
+        _area: Rect,
+        _state: &DashboardState,
     ) -> EngineResult<()> {
         if !self.initialized {
             return Err(EngineError::InvalidState(
@@ -385,9 +384,9 @@ pub fn parse_load_directives(source: &str, base_path: &std::path::Path) -> Vec<P
 fn extract_quoted_string(input: &str) -> Option<&str> {
     let input = input.trim();
 
-    if input.starts_with('"') {
-        if let Some(end) = input[1..].find('"') {
-            return Some(&input[1..=end]);
+    if let Some(rest) = input.strip_prefix('"') {
+        if let Some(end) = rest.find('"') {
+            return Some(&rest[..end]);
         }
     }
 

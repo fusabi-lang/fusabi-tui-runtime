@@ -116,8 +116,6 @@ pub use plugin::{
 
 /// Prelude module for convenient imports.
 pub mod prelude {
-    //! Convenient re-exports for common types and traits.
-
     pub use crate::error::{Result, ScarabError};
     pub use crate::renderer::ScarabRenderer;
     pub use crate::shared::{SharedCell, SharedState};

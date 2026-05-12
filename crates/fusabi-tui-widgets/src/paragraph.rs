@@ -10,9 +10,10 @@ use crate::{
 };
 
 /// Text alignment options.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Alignment {
     /// Align text to the left
+    #[default]
     Left,
     /// Center text horizontally
     Center,
@@ -20,27 +21,16 @@ pub enum Alignment {
     Right,
 }
 
-impl Default for Alignment {
-    fn default() -> Self {
-        Self::Left
-    }
-}
-
 /// Text wrapping modes.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Wrap {
     /// Don't wrap text, truncate if necessary
+    #[default]
     NoWrap,
     /// Wrap at any character
     Wrap,
     /// Wrap at word boundaries
     WordWrap,
-}
-
-impl Default for Wrap {
-    fn default() -> Self {
-        Self::NoWrap
-    }
 }
 
 /// A paragraph widget for displaying multi-line text.
@@ -171,12 +161,10 @@ impl<'a> Paragraph<'a> {
                     current_width += segment_width;
                 }
 
-                if current_width >= width || chars.peek().is_some() {
-                    if !current_line.is_empty() {
-                        wrapped.push(Line::from_spans(current_line));
-                        current_line = Vec::new();
-                        current_width = 0;
-                    }
+                if (current_width >= width || chars.peek().is_some()) && !current_line.is_empty() {
+                    wrapped.push(Line::from_spans(current_line));
+                    current_line = Vec::new();
+                    current_width = 0;
                 }
             }
         }
@@ -193,6 +181,7 @@ impl<'a> Paragraph<'a> {
     }
 
     /// Wraps a line at word boundaries.
+    #[allow(unused_assignments)]
     fn wrap_line_word(&self, line: &'a Line<'a>, width: usize) -> Vec<Line<'a>> {
         let mut wrapped = Vec::new();
         let mut current_line = Vec::new();

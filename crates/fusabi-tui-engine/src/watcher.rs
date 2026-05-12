@@ -39,7 +39,7 @@ impl FileWatcher {
 
         let watcher = RecommendedWatcher::new(
             move |res| {
-                if let Err(_) = tx.send(res) {
+                if tx.send(res).is_err() {
                     // Channel closed, watcher is shutting down
                 }
             },

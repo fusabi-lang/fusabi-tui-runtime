@@ -46,8 +46,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\nTest 1: Loading nonexistent file...");
     let result = engine.load(Path::new("/nonexistent/file.fsx"));
 
-    if result.is_err() {
-        println!("Error occurred (as expected): {}", result.unwrap_err());
+    if let Err(err) = &result {
+        println!("Error occurred (as expected): {err}");
         println!("Error overlay should be visible now.");
     }
 

@@ -150,7 +150,7 @@ pub struct CompletedFrame {
 mod tests {
     use super::*;
     use crate::test::TestRenderer;
-    use fusabi_tui_core::style::Style;
+
     use fusabi_tui_widgets::paragraph::Paragraph;
 
     #[test]

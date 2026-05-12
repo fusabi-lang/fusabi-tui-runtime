@@ -32,25 +32,13 @@ pub enum Direction {
 ///     .value_style(Style::default().fg(Color::Yellow))
 ///     .text_value("42");
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct Bar {
     value: u64,
     label: Option<String>,
     style: Style,
     value_style: Style,
     text_value: Option<String>,
-}
-
-impl Default for Bar {
-    fn default() -> Self {
-        Self {
-            value: 0,
-            label: None,
-            style: Style::default(),
-            value_style: Style::default(),
-            text_value: None,
-        }
-    }
 }
 
 impl Bar {
@@ -114,19 +102,10 @@ impl Bar {
 ///         Bar::default().value(20).style(Style::default().fg(Color::Blue)),
 ///     ]);
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct BarGroup {
     label: Option<String>,
     bars: Vec<Bar>,
-}
-
-impl Default for BarGroup {
-    fn default() -> Self {
-        Self {
-            label: None,
-            bars: Vec::new(),
-        }
-    }
 }
 
 impl BarGroup {
@@ -285,6 +264,7 @@ impl BarChart {
     }
 
     /// Scales a value to a height in characters.
+    #[allow(dead_code)]
     fn scale_to_height(&self, value: u64, max: u64, available_height: u16) -> u16 {
         if max == 0 || available_height == 0 {
             return 0;

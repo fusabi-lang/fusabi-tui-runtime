@@ -308,13 +308,6 @@ impl StatefulWidget for List<'_> {
             let item_idx = start_idx + idx;
             let is_selected = Some(item_idx) == selected;
 
-            // Determine item style
-            let item_style = if is_selected {
-                self.highlight_style
-            } else {
-                item.style
-            };
-
             // Render highlight symbol
             let mut x = list_area.x;
             if let Some(symbol) = self.highlight_symbol {

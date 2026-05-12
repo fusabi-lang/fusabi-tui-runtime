@@ -15,9 +15,10 @@ use crate::widget::StatefulWidget;
 /// Orientation of the scrollbar.
 ///
 /// Determines where the scrollbar is positioned relative to the content.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum ScrollbarOrientation {
     /// Vertical scrollbar on the right side
+    #[default]
     VerticalRight,
     /// Vertical scrollbar on the left side
     VerticalLeft,
@@ -25,12 +26,6 @@ pub enum ScrollbarOrientation {
     HorizontalTop,
     /// Horizontal scrollbar on the bottom
     HorizontalBottom,
-}
-
-impl Default for ScrollbarOrientation {
-    fn default() -> Self {
-        Self::VerticalRight
-    }
 }
 
 /// State for the scrollbar widget.

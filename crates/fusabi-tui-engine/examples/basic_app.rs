@@ -25,7 +25,7 @@ use fusabi_tui_widgets::{
     text::{Line, Span, Text},
     widget::Widget,
 };
-use std::io::{self, stdout};
+use std::io::stdout;
 use std::time::{Duration, Instant};
 
 struct App {
@@ -48,9 +48,8 @@ impl App {
     }
 
     fn on_key(&mut self, code: char) {
-        match code {
-            'q' => self.should_quit = true,
-            _ => {}
+        if code == 'q' {
+            self.should_quit = true
         }
     }
 

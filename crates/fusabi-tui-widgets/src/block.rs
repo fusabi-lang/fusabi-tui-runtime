@@ -8,35 +8,25 @@ use crate::widget::Widget;
 use fusabi_tui_core::{buffer::Buffer, layout::Rect, style::Style};
 
 /// Position of the title within the block.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum TitlePosition {
     /// Title at the top of the block
+    #[default]
     Top,
     /// Title at the bottom of the block
     Bottom,
 }
 
-impl Default for TitlePosition {
-    fn default() -> Self {
-        Self::Top
-    }
-}
-
 /// Horizontal alignment of the title text.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum TitleAlignment {
     /// Align title to the left
+    #[default]
     Left,
     /// Align title to the center
     Center,
     /// Align title to the right
     Right,
-}
-
-impl Default for TitleAlignment {
-    fn default() -> Self {
-        Self::Left
-    }
 }
 
 /// A title for a block with position and alignment.

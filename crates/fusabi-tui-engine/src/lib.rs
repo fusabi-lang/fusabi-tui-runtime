@@ -108,8 +108,6 @@ pub mod watcher;
 
 /// Convenient re-exports for common types and traits.
 pub mod prelude {
-    //! Prelude module with commonly used types.
-
     pub use crate::dashboard::DashboardEngine;
     pub use crate::error::{EngineError, EngineResult, LoadError, WatchError};
     pub use crate::event::{

@@ -49,8 +49,11 @@ pub struct DashboardEngine<R: Renderer> {
 
     /// Callback for widget rendering (set by Fusabi integration).
     /// This allows external code to provide the actual rendering logic.
-    render_callback: Option<Box<dyn Fn(&mut Buffer, Rect, &DashboardState) + Send + Sync>>,
+    render_callback: Option<RenderCallback>,
 }
+
+/// Boxed widget-render callback signature used by `DashboardEngine`.
+pub type RenderCallback = Box<dyn Fn(&mut Buffer, Rect, &DashboardState) + Send + Sync>;
 
 impl<R: Renderer> DashboardEngine<R> {
     /// Create a new dashboard engine with the given renderer and root path.
@@ -461,11 +464,10 @@ impl<R: Renderer> DashboardEngine<R> {
             }
 
             // Ctrl+D to dismiss error overlay
-            if key_event.code == KeyCode::Char('d') && key_event.modifiers.ctrl {
-                if self.has_error() {
-                    self.dismiss_error();
-                    return Ok(Action::Render);
-                }
+            if key_event.code == KeyCode::Char('d') && key_event.modifiers.ctrl && self.has_error()
+            {
+                self.dismiss_error();
+                return Ok(Action::Render);
             }
         }
 
@@ -521,7 +523,7 @@ mod tests {
     use crate::event::{KeyCode, KeyEvent, KeyModifiers};
     use fusabi_tui_render::test::TestRenderer;
     use std::io::Write;
-    use tempfile::{tempdir, NamedTempFile};
+    use tempfile::NamedTempFile;
 
     #[test]
     fn test_dashboard_engine_new() {
