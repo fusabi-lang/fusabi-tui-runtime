@@ -372,6 +372,12 @@ Licensed under either of:
 
 at your option.
 
+### Third-Party Notices
+
+This project adapts core types from [Ratatui](https://github.com/ratatui/ratatui)
+(MIT licensed). See [NOTICES](NOTICES) for the required copyright and license
+acknowledgements.
+
 ## Contributing
 
 Contributions are welcome! This project is in active development. Please check the [documentation](docs/) for architecture details before submitting PRs.
