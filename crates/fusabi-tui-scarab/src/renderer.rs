@@ -76,6 +76,7 @@ impl ScarabRenderer {
     }
 
     /// Get a reference to the shared state.
+    #[allow(dead_code)]
     fn shared_state(&self) -> &SharedState {
         // SAFETY: We verified the size in connect() and SharedState is Pod
         unsafe { &*(self.shm.as_ptr() as *const SharedState) }
@@ -88,6 +89,7 @@ impl ScarabRenderer {
     }
 
     /// Convert a TUI buffer to shared cells.
+    #[allow(dead_code)]
     fn convert_buffer_to_shared(&self, buffer: &Buffer) -> Vec<SharedCell> {
         let mut shared_cells = Vec::with_capacity(BUFFER_SIZE);
 
@@ -95,7 +97,7 @@ impl ScarabRenderer {
             for x in 0..GRID_WIDTH.min(buffer.area.width as usize) {
                 let cell = buffer
                     .get(x as u16, y as u16)
-                    .map(|c| tui_cell_to_shared(c))
+                    .map(tui_cell_to_shared)
                     .unwrap_or_default();
                 shared_cells.push(cell);
             }
@@ -224,17 +226,14 @@ mod tests {
 
         // Create a mock shared memory for testing
         let dir = tempdir().unwrap();
-        let shm_path = dir.path().join("test_shm");
+        let _shm_path = dir.path().join("test_shm");
 
         // We can't easily test the full renderer without Scarab daemon,
         // but we can test the conversion logic
         let mut shared_cells = Vec::new();
         for y in 0..5 {
             for x in 0..10 {
-                let cell = buffer
-                    .get(x, y)
-                    .map(SharedCell::from)
-                    .unwrap_or_default();
+                let cell = buffer.get(x, y).map(SharedCell::from).unwrap_or_default();
                 shared_cells.push(cell);
             }
         }

@@ -15,9 +15,10 @@ use crate::widget::StatefulWidget;
 /// Orientation of the scrollbar.
 ///
 /// Determines where the scrollbar is positioned relative to the content.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum ScrollbarOrientation {
     /// Vertical scrollbar on the right side
+    #[default]
     VerticalRight,
     /// Vertical scrollbar on the left side
     VerticalLeft,
@@ -25,12 +26,6 @@ pub enum ScrollbarOrientation {
     HorizontalTop,
     /// Horizontal scrollbar on the bottom
     HorizontalBottom,
-}
-
-impl Default for ScrollbarOrientation {
-    fn default() -> Self {
-        Self::VerticalRight
-    }
 }
 
 /// State for the scrollbar widget.
@@ -116,7 +111,11 @@ impl ScrollbarState {
 
     /// Scrolls down by one position.
     pub fn scroll_down(&mut self) {
-        if self.position < self.content_length.saturating_sub(self.viewport_content_length) {
+        if self.position
+            < self
+                .content_length
+                .saturating_sub(self.viewport_content_length)
+        {
             self.position = self.position.saturating_add(1);
         }
     }
@@ -133,7 +132,9 @@ impl ScrollbarState {
 
     /// Scrolls to the bottom.
     pub fn scroll_to_bottom(&mut self) {
-        self.position = self.content_length.saturating_sub(self.viewport_content_length);
+        self.position = self
+            .content_length
+            .saturating_sub(self.viewport_content_length);
     }
 }
 
@@ -283,12 +284,14 @@ impl Scrollbar {
             .max(1.0) as usize;
 
         // Calculate thumb position based on scroll position
-        let scrollable_content = state.content_length.saturating_sub(state.viewport_content_length);
+        let scrollable_content = state
+            .content_length
+            .saturating_sub(state.viewport_content_length);
         let scrollable_track = track_length.saturating_sub(thumb_size);
 
         let thumb_position = if scrollable_content > 0 {
-            ((state.position as f64 / scrollable_content as f64) * scrollable_track as f64)
-                .round() as usize
+            ((state.position as f64 / scrollable_content as f64) * scrollable_track as f64).round()
+                as usize
         } else {
             0
         };
@@ -339,7 +342,10 @@ impl Scrollbar {
         // Render end symbol (calculate position first)
         let end_y = if self.end_symbol.is_some() && available_height > 0 {
             available_height = available_height.saturating_sub(1);
-            Some(area.y.saturating_add((area.height as usize).saturating_sub(1) as u16))
+            Some(
+                area.y
+                    .saturating_add((area.height as usize).saturating_sub(1) as u16),
+            )
         } else {
             None
         };
@@ -394,7 +400,10 @@ impl Scrollbar {
         // Render end symbol (calculate position first)
         let end_x = if self.end_symbol.is_some() && available_width > 0 {
             available_width = available_width.saturating_sub(1);
-            Some(area.x.saturating_add((area.width as usize).saturating_sub(1) as u16))
+            Some(
+                area.x
+                    .saturating_add((area.width as usize).saturating_sub(1) as u16),
+            )
         } else {
             None
         };
@@ -536,7 +545,10 @@ mod tests {
             .track_symbol("-")
             .style(Style::default().fg(Color::Green));
 
-        assert_eq!(scrollbar.orientation, ScrollbarOrientation::HorizontalBottom);
+        assert_eq!(
+            scrollbar.orientation,
+            ScrollbarOrientation::HorizontalBottom
+        );
         assert_eq!(scrollbar.thumb_symbol, "X");
         assert_eq!(scrollbar.track_symbol, "-");
         assert_eq!(scrollbar.style.fg, Some(Color::Green));
@@ -588,8 +600,7 @@ mod tests {
 
     #[test]
     fn test_scrollbar_render_horizontal() {
-        let scrollbar = Scrollbar::new()
-            .orientation(ScrollbarOrientation::HorizontalBottom);
+        let scrollbar = Scrollbar::new().orientation(ScrollbarOrientation::HorizontalBottom);
         let mut state = ScrollbarState::new(100)
             .position(0)
             .viewport_content_length(10);

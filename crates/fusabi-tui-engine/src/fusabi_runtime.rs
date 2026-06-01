@@ -38,11 +38,9 @@
 
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::Arc;
 
 use fusabi_tui_core::buffer::Buffer;
 use fusabi_tui_core::layout::Rect;
-use fusabi_tui_core::style::{Color, Modifier, Style};
 
 use crate::error::{EngineError, EngineResult};
 use crate::state::DashboardState;
@@ -55,6 +53,7 @@ use crate::state::DashboardState;
 #[derive(Debug)]
 pub struct FusabiContext {
     /// Path to the entry script file.
+    #[allow(dead_code)]
     entry_file: PathBuf,
 
     /// Compiled module cache for hot reload optimization.
@@ -84,7 +83,7 @@ impl FusabiContext {
     /// Create a new Fusabi context for the given entry file.
     ///
     /// This initializes the Fusabi engine and registers all TUI host functions.
-    /// The script is not evaluated until [`evaluate`] is called.
+    /// The script is not evaluated until [`FusabiContext::evaluate`] is called.
     pub fn new(entry_file: PathBuf) -> Self {
         let mut ctx = Self {
             entry_file,
@@ -115,7 +114,7 @@ impl FusabiContext {
     /// - The script contains syntax errors
     /// - A required dependency is missing
     /// - Runtime evaluation fails
-    pub fn evaluate(&mut self, source: &str) -> EngineResult<()> {
+    pub fn evaluate(&mut self, _source: &str) -> EngineResult<()> {
         // TODO: Integrate with Fusabi v0.34+ engine
         // 1. Create Engine instance
         // 2. Register host functions via call_host API
@@ -142,9 +141,9 @@ impl FusabiContext {
     /// Returns an error if the render function fails or is not defined.
     pub fn render(
         &mut self,
-        buffer: &mut Buffer,
-        area: Rect,
-        state: &DashboardState,
+        _buffer: &mut Buffer,
+        _area: Rect,
+        _state: &DashboardState,
     ) -> EngineResult<()> {
         if !self.initialized {
             return Err(EngineError::InvalidState(
@@ -194,12 +193,26 @@ impl FusabiContext {
             .push("tui.color.indexed".to_string());
 
         // tui.color.reset() -> Color
-        self.registered_functions.push("tui.color.reset".to_string());
+        self.registered_functions
+            .push("tui.color.reset".to_string());
 
         // Named colors
         for name in &[
-            "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white", "darkGray",
-            "lightRed", "lightGreen", "lightYellow", "lightBlue", "lightMagenta", "lightCyan",
+            "black",
+            "red",
+            "green",
+            "yellow",
+            "blue",
+            "magenta",
+            "cyan",
+            "white",
+            "darkGray",
+            "lightRed",
+            "lightGreen",
+            "lightYellow",
+            "lightBlue",
+            "lightMagenta",
+            "lightCyan",
         ] {
             self.registered_functions
                 .push(format!("tui.color.{}", name));
@@ -311,8 +324,7 @@ impl FusabiContext {
             .push("tui.buffer.setStyle".to_string());
 
         // tui.buffer.get(x, y, buffer) -> Cell
-        self.registered_functions
-            .push("tui.buffer.get".to_string());
+        self.registered_functions.push("tui.buffer.get".to_string());
 
         // tui.buffer.clear(buffer) -> ()
         self.registered_functions
@@ -372,9 +384,9 @@ pub fn parse_load_directives(source: &str, base_path: &std::path::Path) -> Vec<P
 fn extract_quoted_string(input: &str) -> Option<&str> {
     let input = input.trim();
 
-    if input.starts_with('"') {
-        if let Some(end) = input[1..].find('"') {
-            return Some(&input[1..=end]);
+    if let Some(rest) = input.strip_prefix('"') {
+        if let Some(end) = rest.find('"') {
+            return Some(&rest[..end]);
         }
     }
 
@@ -413,7 +425,10 @@ let x = 42
     #[test]
     fn test_extract_quoted_string() {
         assert_eq!(extract_quoted_string(r#""hello""#), Some("hello"));
-        assert_eq!(extract_quoted_string(r#"  "path/to/file"  "#), Some("path/to/file"));
+        assert_eq!(
+            extract_quoted_string(r#"  "path/to/file"  "#),
+            Some("path/to/file")
+        );
         assert_eq!(extract_quoted_string(r#"unquoted"#), None);
         assert_eq!(extract_quoted_string(r#""unclosed"#), None);
     }

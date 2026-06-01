@@ -7,11 +7,11 @@
 //! - Handling keyboard events
 //! - Clean shutdown
 
+use crossterm::ExecutableCommand;
 use crossterm::{
     event::{self, Event as CrosstermEvent, KeyCode as CrosstermKeyCode, KeyEventKind},
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use crossterm::ExecutableCommand;
 use fusabi_tui_core::{
     buffer::Buffer,
     layout::{Constraint, Direction, Layout, Rect},
@@ -25,7 +25,7 @@ use fusabi_tui_widgets::{
     text::{Line, Span, Text},
     widget::Widget,
 };
-use std::io::{self, stdout};
+use std::io::stdout;
 use std::time::{Duration, Instant};
 
 struct App {
@@ -48,9 +48,8 @@ impl App {
     }
 
     fn on_key(&mut self, code: char) {
-        match code {
-            'q' => self.should_quit = true,
-            _ => {}
+        if code == 'q' {
+            self.should_quit = true
         }
     }
 

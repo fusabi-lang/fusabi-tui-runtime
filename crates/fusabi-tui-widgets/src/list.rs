@@ -1,10 +1,6 @@
 //! List widget for displaying scrollable lists with selection.
 
-use fusabi_tui_core::{
-    buffer::Buffer,
-    layout::Rect,
-    style::Style,
-};
+use fusabi_tui_core::{buffer::Buffer, layout::Rect, style::Style};
 
 use crate::{
     block::Block,
@@ -291,7 +287,7 @@ impl StatefulWidget for List<'_> {
         // Calculate visible range
         let list_height = list_area.height as usize;
         let selected = state.selected();
-        
+
         // Auto-scroll to keep selected item visible
         if let Some(selected_idx) = selected {
             if selected_idx < state.offset {
@@ -306,20 +302,11 @@ impl StatefulWidget for List<'_> {
 
         // Render visible items
         let mut current_y = list_area.y;
-        let highlight_symbol_width = self.highlight_symbol
-            .map(|s| s.len())
-            .unwrap_or(0) as u16;
+        let highlight_symbol_width = self.highlight_symbol.map(|s| s.len()).unwrap_or(0) as u16;
 
         for (idx, item) in self.items[start_idx..end_idx].iter().enumerate() {
             let item_idx = start_idx + idx;
             let is_selected = Some(item_idx) == selected;
-
-            // Determine item style
-            let item_style = if is_selected {
-                self.highlight_style
-            } else {
-                item.style
-            };
 
             // Render highlight symbol
             let mut x = list_area.x;
@@ -332,7 +319,7 @@ impl StatefulWidget for List<'_> {
 
             // Render item content
             let content_width = list_area.width.saturating_sub(highlight_symbol_width);
-            
+
             for (line_idx, line) in item.content.lines.iter().enumerate() {
                 if current_y >= list_area.y + list_area.height {
                     break;
@@ -353,7 +340,8 @@ impl StatefulWidget for List<'_> {
                             break;
                         }
                         buf.set_string(line_x, current_y, &ch.to_string(), span_style);
-                        line_x += unicode_width::UnicodeWidthStr::width(ch.to_string().as_str()) as u16;
+                        line_x +=
+                            unicode_width::UnicodeWidthStr::width(ch.to_string().as_str()) as u16;
                     }
                 }
 
@@ -366,7 +354,7 @@ impl StatefulWidget for List<'_> {
                 }
 
                 current_y += 1;
-                
+
                 // Don't render more lines if this is a multi-line item
                 if line_idx == 0 {
                     break;
@@ -405,7 +393,7 @@ mod tests {
     #[test]
     fn test_list_state_select_next() {
         let mut state = ListState::default();
-        
+
         state.select_next(3);
         assert_eq!(state.selected(), Some(0));
 
@@ -422,7 +410,7 @@ mod tests {
     #[test]
     fn test_list_state_select_previous() {
         let mut state = ListState::default();
-        
+
         state.select_previous(3);
         assert_eq!(state.selected(), Some(2)); // Starts at last
 
@@ -438,10 +426,7 @@ mod tests {
 
     #[test]
     fn test_list_creation() {
-        let items = vec![
-            ListItem::new("Item 1"),
-            ListItem::new("Item 2"),
-        ];
+        let items = vec![ListItem::new("Item 1"), ListItem::new("Item 2")];
         let list = List::new(items);
         assert_eq!(list.len(), 2);
     }

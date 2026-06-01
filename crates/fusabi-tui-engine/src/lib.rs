@@ -108,14 +108,12 @@ pub mod watcher;
 
 /// Convenient re-exports for common types and traits.
 pub mod prelude {
-    //! Prelude module with commonly used types.
-
     pub use crate::dashboard::DashboardEngine;
     pub use crate::error::{EngineError, EngineResult, LoadError, WatchError};
     pub use crate::event::{
         Action, Event, KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind,
     };
-    pub use crate::fusabi_runtime::{FusabiContext, parse_load_directives};
+    pub use crate::fusabi_runtime::{parse_load_directives, FusabiContext};
     pub use crate::loader::{FileLoader, LoadedFile};
     pub use crate::overlay::{ErrorMessage, ErrorOverlay, ErrorSeverity};
     pub use crate::state::{DashboardState, ListState, TableState, WidgetState};

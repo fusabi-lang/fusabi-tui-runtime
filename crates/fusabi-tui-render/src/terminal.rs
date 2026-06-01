@@ -60,9 +60,7 @@ impl<R: Renderer> Terminal<R> {
         self.renderer.draw(&buffer)?;
         self.renderer.flush()?;
 
-        Ok(CompletedFrame {
-            area: size,
-        })
+        Ok(CompletedFrame { area: size })
     }
 
     /// Gets the current terminal size.
@@ -152,7 +150,7 @@ pub struct CompletedFrame {
 mod tests {
     use super::*;
     use crate::test::TestRenderer;
-    use fusabi_tui_core::style::Style;
+
     use fusabi_tui_widgets::paragraph::Paragraph;
 
     #[test]

@@ -151,11 +151,7 @@ pub fn flags_to_modifier(flags: u8) -> Modifier {
 /// Convert a Fusabi TUI Cell to a Scarab SharedCell.
 pub fn tui_cell_to_shared(cell: &TuiCell) -> SharedCell {
     // Extract the first character (or use space if empty)
-    let char_codepoint = cell
-        .symbol
-        .chars()
-        .next()
-        .unwrap_or(' ') as u32;
+    let char_codepoint = cell.symbol.chars().next().unwrap_or(' ') as u32;
 
     let fg = color_to_u32(cell.fg);
     let bg = color_to_u32(cell.bg);

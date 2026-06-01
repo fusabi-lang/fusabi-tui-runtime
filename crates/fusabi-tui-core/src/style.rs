@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 /// Supports both standard ANSI colors and extended 256-color/RGB modes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Default)]
 pub enum Color {
     /// Black color (ANSI 0)
     Black,
@@ -51,13 +52,8 @@ pub enum Color {
     /// Indexed color (0-255) from the 256-color palette
     Indexed(u8),
     /// Reset to the terminal's default color
+    #[default]
     Reset,
-}
-
-impl Default for Color {
-    fn default() -> Self {
-        Color::Reset
-    }
 }
 
 impl fmt::Display for Color {
@@ -414,13 +410,9 @@ mod tests {
 
     #[test]
     fn test_style_patch() {
-        let style1 = Style::new()
-            .fg(Color::Red)
-            .add_modifier(Modifier::BOLD);
+        let style1 = Style::new().fg(Color::Red).add_modifier(Modifier::BOLD);
 
-        let style2 = Style::new()
-            .bg(Color::Black)
-            .add_modifier(Modifier::ITALIC);
+        let style2 = Style::new().bg(Color::Black).add_modifier(Modifier::ITALIC);
 
         let patched = style1.patch(style2);
         assert_eq!(patched.fg, Some(Color::Red));

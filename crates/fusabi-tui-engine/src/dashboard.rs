@@ -49,8 +49,11 @@ pub struct DashboardEngine<R: Renderer> {
 
     /// Callback for widget rendering (set by Fusabi integration).
     /// This allows external code to provide the actual rendering logic.
-    render_callback: Option<Box<dyn Fn(&mut Buffer, Rect, &DashboardState) + Send + Sync>>,
+    render_callback: Option<RenderCallback>,
 }
+
+/// Boxed widget-render callback signature used by `DashboardEngine`.
+pub type RenderCallback = Box<dyn Fn(&mut Buffer, Rect, &DashboardState) + Send + Sync>;
 
 impl<R: Renderer> DashboardEngine<R> {
     /// Create a new dashboard engine with the given renderer and root path.
@@ -283,11 +286,17 @@ impl<R: Renderer> DashboardEngine<R> {
     fn render_placeholder(&self, buffer: &mut Buffer, area: Rect) {
         use fusabi_tui_widgets::block::Title;
 
-        let entry_file = self.entry_file.as_ref().map(|p| p.display().to_string())
+        let entry_file = self
+            .entry_file
+            .as_ref()
+            .map(|p| p.display().to_string())
             .unwrap_or_else(|| "unknown".to_string());
 
-        let title = Title::new(" Fusabi Dashboard ")
-            .style(Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD));
+        let title = Title::new(" Fusabi Dashboard ").style(
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        );
 
         let block = Block::default()
             .title(title)
@@ -306,12 +315,15 @@ impl<R: Renderer> DashboardEngine<R> {
              Waiting for Fusabi render callback...\n\n\
              Press Ctrl+R to reload, Ctrl+C to quit",
             entry_file,
-            if self.watcher.is_some() { "enabled" } else { "disabled" },
+            if self.watcher.is_some() {
+                "enabled"
+            } else {
+                "disabled"
+            },
             self.state.widgets.len()
         );
 
-        let para = Paragraph::new(info_text)
-            .style(Style::default().fg(Color::White));
+        let para = Paragraph::new(info_text).style(Style::default().fg(Color::White));
         para.render(inner, buffer);
     }
 
@@ -319,8 +331,11 @@ impl<R: Renderer> DashboardEngine<R> {
     fn render_empty_state(&self, buffer: &mut Buffer, area: Rect) {
         use fusabi_tui_widgets::block::Title;
 
-        let title = Title::new(" Fusabi Dashboard Engine ")
-            .style(Style::default().fg(Color::Blue).add_modifier(Modifier::BOLD));
+        let title = Title::new(" Fusabi Dashboard Engine ").style(
+            Style::default()
+                .fg(Color::Blue)
+                .add_modifier(Modifier::BOLD),
+        );
 
         let block = Block::default()
             .title(title)
@@ -341,8 +356,7 @@ impl<R: Renderer> DashboardEngine<R> {
               - Error overlay for debugging\n\n\
             Press Ctrl+C to quit";
 
-        let para = Paragraph::new(info_text)
-            .style(Style::default().fg(Color::DarkGray));
+        let para = Paragraph::new(info_text).style(Style::default().fg(Color::DarkGray));
         para.render(inner, buffer);
     }
 
@@ -450,11 +464,10 @@ impl<R: Renderer> DashboardEngine<R> {
             }
 
             // Ctrl+D to dismiss error overlay
-            if key_event.code == KeyCode::Char('d') && key_event.modifiers.ctrl {
-                if self.has_error() {
-                    self.dismiss_error();
-                    return Ok(Action::Render);
-                }
+            if key_event.code == KeyCode::Char('d') && key_event.modifiers.ctrl && self.has_error()
+            {
+                self.dismiss_error();
+                return Ok(Action::Render);
             }
         }
 
@@ -510,7 +523,7 @@ mod tests {
     use crate::event::{KeyCode, KeyEvent, KeyModifiers};
     use fusabi_tui_render::test::TestRenderer;
     use std::io::Write;
-    use tempfile::{tempdir, NamedTempFile};
+    use tempfile::NamedTempFile;
 
     #[test]
     fn test_dashboard_engine_new() {

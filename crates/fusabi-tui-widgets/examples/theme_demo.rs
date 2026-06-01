@@ -6,8 +6,8 @@
 use fusabi_tui_core::{
     buffer::Buffer,
     layout::Rect,
-    theme::{ColorPalette, Theme},
     style::Color,
+    theme::{ColorPalette, Theme},
 };
 use fusabi_tui_widgets::{
     block::Block,
@@ -49,23 +49,10 @@ fn main() {
     let custom_theme = Theme::new("Custom", custom_palette);
     print_theme_demo(&custom_theme, &mut buffer);
 
-    // Demo 5: Theme serialization
+    // Demo 5: Theme serialization (requires fusabi-tui-core/serde feature;
+    // not exposed via this widgets-example, so just print a placeholder).
     println!("\n=== Theme Serialization ===");
-    #[cfg(feature = "fusabi-tui-core/serde")]
-    {
-        let theme = Theme::slime();
-        match theme.to_toml() {
-            Ok(toml) => {
-                println!("Slime theme as TOML:\n{}", toml);
-            }
-            Err(e) => println!("Error serializing theme: {}", e),
-        }
-    }
-
-    #[cfg(not(feature = "fusabi-tui-core/serde"))]
-    {
-        println!("(serde feature not enabled)");
-    }
+    println!("(enable fusabi-tui-core serde feature to serialize themes)");
 }
 
 fn print_theme_demo(theme: &Theme, buffer: &mut Buffer) {

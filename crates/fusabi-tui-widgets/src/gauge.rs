@@ -3,12 +3,7 @@
 //! This module provides a `Gauge` widget that visualizes progress using a horizontal bar
 //! with customizable filled and unfilled styles.
 
-use fusabi_tui_core::{
-    buffer::Buffer,
-    layout::Rect,
-    style::Style,
-    symbols::block,
-};
+use fusabi_tui_core::{buffer::Buffer, layout::Rect, style::Style, symbols::block};
 use unicode_width::UnicodeWidthStr;
 
 use crate::block::Block;
@@ -212,9 +207,9 @@ impl Widget for Gauge {
         if let Some(ref label) = self.label {
             let label_width = label.width();
             if label_width <= gauge_area.width as usize {
-                let label_x = gauge_area.x.saturating_add(
-                    (gauge_area.width.saturating_sub(label_width as u16)) / 2,
-                );
+                let label_x = gauge_area
+                    .x
+                    .saturating_add((gauge_area.width.saturating_sub(label_width as u16)) / 2);
 
                 for (i, ch) in label.chars().enumerate() {
                     let x = label_x.saturating_add(i as u16);
@@ -317,7 +312,9 @@ mod tests {
 
     #[test]
     fn test_gauge_render_full() {
-        let gauge = Gauge::new().ratio(1.0).gauge_style(Style::default().fg(Color::Green));
+        let gauge = Gauge::new()
+            .ratio(1.0)
+            .gauge_style(Style::default().fg(Color::Green));
         let area = Rect::new(0, 0, 10, 1);
         let mut buffer = Buffer::new(area);
         gauge.render(area, &mut buffer);
@@ -332,7 +329,9 @@ mod tests {
 
     #[test]
     fn test_gauge_render_half() {
-        let gauge = Gauge::new().ratio(0.5).gauge_style(Style::default().fg(Color::Blue));
+        let gauge = Gauge::new()
+            .ratio(0.5)
+            .gauge_style(Style::default().fg(Color::Blue));
         let area = Rect::new(0, 0, 10, 1);
         let mut buffer = Buffer::new(area);
         gauge.render(area, &mut buffer);

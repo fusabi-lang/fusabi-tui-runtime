@@ -48,9 +48,10 @@ impl Default for Borders {
 ///
 /// Different border types use different Unicode characters for drawing the border lines
 /// and corners.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum BorderType {
     /// Plain borders using simple box-drawing characters (┌─┐│└─┘)
+    #[default]
     Plain,
     /// Rounded borders using rounded corners (╭─╮│╰─╯)
     Rounded,
@@ -60,17 +61,20 @@ pub enum BorderType {
     Thick,
 }
 
-impl Default for BorderType {
-    fn default() -> Self {
-        Self::Plain
-    }
-}
-
 impl BorderType {
     /// Returns the Unicode characters for this border type.
     ///
     /// Returns a tuple of (horizontal, vertical, top_left, top_right, bottom_left, bottom_right).
-    pub(crate) fn line_symbols(self) -> (&'static str, &'static str, &'static str, &'static str, &'static str, &'static str) {
+    pub(crate) fn line_symbols(
+        self,
+    ) -> (
+        &'static str,
+        &'static str,
+        &'static str,
+        &'static str,
+        &'static str,
+        &'static str,
+    ) {
         use fusabi_tui_core::symbols::line;
 
         match self {

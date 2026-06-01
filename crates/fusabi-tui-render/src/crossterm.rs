@@ -103,7 +103,10 @@ impl<W: Write + Send> CrosstermRenderer<W> {
             crossterm::execute!(self.writer, crossterm::style::SetAttribute(Attribute::Dim))?;
         }
         if modifier.contains(Modifier::ITALIC) {
-            crossterm::execute!(self.writer, crossterm::style::SetAttribute(Attribute::Italic))?;
+            crossterm::execute!(
+                self.writer,
+                crossterm::style::SetAttribute(Attribute::Italic)
+            )?;
         }
         if modifier.contains(Modifier::UNDERLINED) {
             crossterm::execute!(
@@ -130,7 +133,10 @@ impl<W: Write + Send> CrosstermRenderer<W> {
             )?;
         }
         if modifier.contains(Modifier::HIDDEN) {
-            crossterm::execute!(self.writer, crossterm::style::SetAttribute(Attribute::Hidden))?;
+            crossterm::execute!(
+                self.writer,
+                crossterm::style::SetAttribute(Attribute::Hidden)
+            )?;
         }
         if modifier.contains(Modifier::CROSSED_OUT) {
             crossterm::execute!(
@@ -153,10 +159,12 @@ impl<W: Write + Send> CrosstermRenderer<W> {
         crossterm::execute!(self.writer, SetAttribute(Attribute::Reset))?;
 
         // Set foreground color
-        self.writer.execute(SetForegroundColor(Self::convert_color(cell.fg)))?;
+        self.writer
+            .execute(SetForegroundColor(Self::convert_color(cell.fg)))?;
 
         // Set background color
-        self.writer.execute(SetBackgroundColor(Self::convert_color(cell.bg)))?;
+        self.writer
+            .execute(SetBackgroundColor(Self::convert_color(cell.bg)))?;
 
         // Apply modifiers
         self.apply_modifiers(cell.modifier)?;

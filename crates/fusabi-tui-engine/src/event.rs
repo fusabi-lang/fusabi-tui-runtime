@@ -55,10 +55,13 @@ pub enum KeyCode {
     /// Tab key.
     Tab,
 
-    /// Arrow keys.
+    /// Up arrow key.
     Up,
+    /// Down arrow key.
     Down,
+    /// Left arrow key.
     Left,
+    /// Right arrow key.
     Right,
 
     /// Home key.
@@ -86,9 +89,13 @@ pub enum KeyCode {
 /// Modifier keys for keyboard events.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct KeyModifiers {
+    /// Shift modifier pressed.
     pub shift: bool,
+    /// Control modifier pressed.
     pub ctrl: bool,
+    /// Alt (Option) modifier pressed.
     pub alt: bool,
+    /// Meta (Command / Super) modifier pressed.
     pub meta: bool,
 }
 
@@ -162,16 +169,20 @@ pub enum MouseEventKind {
     /// Mouse was moved.
     Moved,
 
-    /// Mouse wheel was scrolled.
+    /// Mouse wheel was scrolled up.
     ScrollUp,
+    /// Mouse wheel was scrolled down.
     ScrollDown,
 }
 
 /// Mouse buttons.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MouseButton {
+    /// Left mouse button.
     Left,
+    /// Right mouse button.
     Right,
+    /// Middle (scroll) mouse button.
     Middle,
 }
 

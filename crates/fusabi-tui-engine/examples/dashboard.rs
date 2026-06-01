@@ -7,11 +7,11 @@
 //! - Event handling
 //! - State management
 
+use crossterm::ExecutableCommand;
 use crossterm::{
     event::{self, Event as CrosstermEvent, KeyCode as CrosstermKeyCode, KeyEventKind},
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use crossterm::ExecutableCommand;
 use fusabi_tui_core::{
     buffer::Buffer,
     layout::{Constraint, Direction, Layout, Rect},
@@ -183,8 +183,7 @@ impl Dashboard {
         sparkline.render(chunks[2], buffer);
 
         // Info text
-        let info =
-            Paragraph::new("Hot reload enabled!\n\nEdit this file and save to see changes.");
+        let info = Paragraph::new("Hot reload enabled!\n\nEdit this file and save to see changes.");
         let info_block = Block::default()
             .title("Info")
             .borders(Borders::ALL)
@@ -216,11 +215,7 @@ impl Dashboard {
                     .borders(Borders::ALL)
                     .border_type(BorderType::Rounded),
             )
-            .highlight_style(
-                Style::new()
-                    .bg(Color::Blue)
-                    .add_modifier(Modifier::BOLD),
-            )
+            .highlight_style(Style::new().bg(Color::Blue).add_modifier(Modifier::BOLD))
             .highlight_symbol(">> ");
 
         StatefulWidget::render(&list, area, buffer, &mut self.list_state);

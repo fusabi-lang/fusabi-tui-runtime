@@ -231,13 +231,9 @@ impl Constraint {
                 let p = min(p, 100);
                 (length as u32 * p as u32 / 100) as u16
             }
-            Constraint::Ratio(numerator, denominator) => {
-                if denominator == 0 {
-                    0
-                } else {
-                    (length as u32 * numerator / denominator) as u16
-                }
-            }
+            Constraint::Ratio(numerator, denominator) => (length as u32 * numerator)
+                .checked_div(denominator)
+                .unwrap_or(0) as u16,
             Constraint::Min(m) => max(length, m),
             Constraint::Max(m) => min(length, m),
             Constraint::Fill(_) => length,
@@ -373,16 +369,8 @@ impl Layout {
         // Third pass: apply Min and Max constraints
         for (i, constraint) in self.constraints.iter().enumerate() {
             match constraint {
-                Constraint::Min(min) => {
-                    if sizes[i] < *min {
-                        sizes[i] = *min;
-                    }
-                }
-                Constraint::Max(max) => {
-                    if sizes[i] > *max {
-                        sizes[i] = *max;
-                    }
-                }
+                Constraint::Min(min) if sizes[i] < *min => sizes[i] = *min,
+                Constraint::Max(max) if sizes[i] > *max => sizes[i] = *max,
                 _ => {}
             }
         }
